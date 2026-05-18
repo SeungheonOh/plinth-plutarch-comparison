@@ -1,0 +1,22 @@
+# source: src/Voting/Contracts/VotingPlinth.hs
+#
+# Category: Plinth - GHC/plugin flag misconfiguration
+# Bug: the plugin's `target-version` option is set to a value the PLC
+# version parser cannot understand. The plugin's `plcParserOption`
+# returns a parse error, which the plugin lifts into a
+# `CannotParseValue` diagnostic listing the offending key and value.
+#
+# Apply with:
+#   cp <repo>/src/Voting/Contracts/VotingPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -7,6 +7,7 @@
+ {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:inline-unconditional-growth=20 #-}
+ {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:no-preserve-logging #-}
+ {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:preserve-source-locations #-}
++{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:target-version=not.a.version #-}
+
+ module Voting.Contracts.VotingPlinth (
+   plinthVotingScript,

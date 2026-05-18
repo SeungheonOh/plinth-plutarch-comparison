@@ -1,0 +1,24 @@
+# source: src/Vesting/Contracts/Vesting.hs
+#
+# Category: Plutarch - PAsData wrap/unwrap confusion
+# Bug: drop the `pfromData` on `pvdBeneficiary`. Inside `unTermCont`, the
+# record fields of `PVestingDatum` have type `Term s (PAsData PPubKeyHash)`.
+# `pmustBeSignedBy` is later applied to `beneficiary` and expects
+# `Term s PPubKeyHash` (the unwrapped form). Forgetting `pfromData`
+# leaves `beneficiary :: Term s (PAsData PPubKeyHash)`, and GHC fails
+# with "Couldn't match type `PAsData PPubKeyHash` with `PPubKeyHash`".
+#
+# Apply with:
+#   cp <repo>/src/Vesting/Contracts/Vesting.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -183,7 +183,7 @@
+                   } <-
+                   pmatchC datum
+-                let beneficiary = pfromData pvdBeneficiary
++                let beneficiary = pvdBeneficiary
+                     startTimestamp = pfromData pvdStartTimestamp
+                     duration = pfromData pvdDuration
+                     totalAmount = pfromData pvdAmount

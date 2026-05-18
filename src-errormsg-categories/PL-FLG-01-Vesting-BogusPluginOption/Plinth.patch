@@ -1,0 +1,31 @@
+# source: src/Vesting/Contracts/VestingPlinth.hs
+#
+# Category: Plinth - GHC/plugin flag misconfiguration
+# Bug: an unknown option is passed to the Plinth plugin via
+# `-fplugin-opt Plinth.Plugin:bogus-option`. The plugin's option
+# parser checks every key against the registered set (target-version,
+# typecheck, defer-errors, conservative-optimisation, ...) and aborts
+# at plugin initialisation with an `Unrecognised option` diagnostic
+# pointing at the typo'd key.
+#
+# This is the misconfiguration analogue of forgetting one of the
+# documented Plinth-required flags: the modern plugin actively
+# rewrites the dangerous GHC defaults (`-fignore-interface-pragmas`,
+# `-fomit-interface-pragmas`, `-fspecialise`, `-fstrictness`, ...)
+# via its driverPlugin, so the only flag-level mistakes the user can
+# make are inside the `Plinth.Plugin:*` option namespace.
+#
+# Apply with:
+#   cp <repo>/src/Vesting/Contracts/VestingPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -8,6 +8,7 @@
+ {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:inline-unconditional-growth=20 #-}
+ {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:no-preserve-logging #-}
+ {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:preserve-source-locations #-}
++{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:bogus-option #-}
+
+ module Vesting.Contracts.VestingPlinth (
+   plinthVestingScript,

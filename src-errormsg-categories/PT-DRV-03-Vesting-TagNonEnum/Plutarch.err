@@ -1,0 +1,41 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-03-Vesting-TagNonEnum/Plutarch.hs:74:13-22: error: [GHC-64725]
+    • DeriveAsTag only supports constructors without arguments. However, at constructor #1, I got:
+      '[Term s (PAsData PInteger)]
+    • When deriving the instance for (PlutusType PVestingRedeemer)
+   |
+74 |   deriving (PlutusType) via (DeriveAsTag PVestingRedeemer)
+   |             ^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-03-Vesting-TagNonEnum/Plutarch.hs:74:13-22: error: [GHC-18872]
+    • Couldn't match representation of type: Term s (PAsData PInteger)
+                               with that of: DeriveAsTag PVestingRedeemer s
+        arising from the coercion of the method ‘Plutarch.Internal.PlutusType.pmatch'’
+          from type ‘forall (s :: S) (b :: S -> *).
+                     Term s (PInner (DeriveAsTag PVestingRedeemer))
+                     -> (DeriveAsTag PVestingRedeemer s -> Term s b) -> Term s b’
+            to type ‘forall (s :: S) (b :: S -> *).
+                     Term s (PInner PVestingRedeemer)
+                     -> (PVestingRedeemer s -> Term s b) -> Term s b’
+        The data constructor ‘Plutarch.Internal.Term.Term’
+          of newtype ‘Term’ is not in scope
+    • When deriving the instance for (PlutusType PVestingRedeemer)
+   |
+74 |   deriving (PlutusType) via (DeriveAsTag PVestingRedeemer)
+   |             ^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-03-Vesting-TagNonEnum/Plutarch.hs:74:13-22: error: [GHC-18872]
+    • Couldn't match representation of type: Term s (PAsData PInteger)
+                               with that of: DeriveAsTag PVestingRedeemer s
+        arising from the coercion of the method ‘Plutarch.Internal.PlutusType.pcon'’
+          from type ‘forall (s :: S).
+                     DeriveAsTag PVestingRedeemer s
+                     -> Term s (PInner (DeriveAsTag PVestingRedeemer))’
+            to type ‘forall (s :: S).
+                     PVestingRedeemer s -> Term s (PInner PVestingRedeemer)’
+        The data constructor ‘Plutarch.Internal.Term.Term’
+          of newtype ‘Term’ is not in scope
+    • When deriving the instance for (PlutusType PVestingRedeemer)
+   |
+74 |   deriving (PlutusType) via (DeriveAsTag PVestingRedeemer)
+   |             ^^^^^^^^^^

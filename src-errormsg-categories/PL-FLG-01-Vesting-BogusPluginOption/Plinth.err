@@ -1,0 +1,7 @@
+panic! (the 'impossible' happened)
+  GHC version 9.6.6:
+	PlutusTx.Plugin: failed to parse options:
+Unrecognised option: "bogus-option".
+
+Please report this as a GHC bug:  https://www.haskell.org/ghc/reportabug
+

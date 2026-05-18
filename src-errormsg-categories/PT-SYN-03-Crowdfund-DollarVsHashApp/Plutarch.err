@@ -1,0 +1,21 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-03-Crowdfund-DollarVsHashApp/Plutarch.hs:30:31-34: error: [GHC-83865]
+    • Couldn't match expected type: Term
+                                      s1 ((list0 a1 :--> b) :--> (list0 a1 :--> b))
+                                    -> Term s' (l a :--> PInteger)
+                  with actual type: Term
+                                      s0 (((a0 :--> b0) :--> (a0 :--> b0)) :--> (a0 :--> b0))
+    • In the first argument of ‘($)’, namely ‘pfix’
+      In the second argument of ‘($)’, namely
+        ‘pfix
+           $ plam $ \ self xs -> pelimList (\ _ rest -> 1 + self # rest) 0 xs’
+      In the expression:
+        phoistAcyclic
+          $ pfix
+              $ plam $ \ self xs -> pelimList (\ _ rest -> 1 + self # rest) 0 xs
+    • Relevant bindings include
+        plistLength :: Term s (l a :--> PInteger)
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-03-Crowdfund-DollarVsHashApp/Plutarch.hs:30:1)
+   |
+30 | plistLength = phoistAcyclic $ pfix $ plam $ \self xs ->
+   |                               ^^^^

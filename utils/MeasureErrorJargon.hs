@@ -5,32 +5,38 @@
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
--- |
--- Counts error-message jargon in src-errormsg-top8/EXX-*/{Plinth,Plutarch}.err.
---
--- DSL-jargon tokens reuse the curated lists from JargonLists (identical to the
--- source-program jargon methodology). Internal-jargon tokens are matched
--- against a separate pattern set covering TH skolems, Core variable suffixes,
--- class dictionaries, qualified GHC/PlutusTx-internal modules, Core
--- annotations, and Plinth-plugin banner phrases.
---
--- A single token receives at most one classification; Internal wins over DSL
--- because the paper explicitly says compiler-internal identifiers are worse.
---
--- Counts are summed across every diagnostic in the .err file; tokens inside
--- the GHC source-preview band are included.
+{- |
+Counts error-message jargon in
+src-errormsg-categories/{PL,PT}-XXX-NN-.../{Plinth,Plutarch}.err.
+
+Case directories are auto-discovered under @topRoot@. The first three
+dash-separated segments of the directory name form the @category@
+label (e.g. @PL-USF@, @PT-DRV@) reported in CSV/Markdown.
+
+DSL-jargon tokens reuse the curated lists from JargonLists (identical to the
+source-program jargon methodology). Internal-jargon tokens are matched
+against a separate pattern set covering TH skolems, Core variable suffixes,
+class dictionaries, qualified GHC/PlutusTx-internal modules, Core
+annotations, and Plinth-plugin banner phrases.
+
+A single token receives at most one classification; Internal wins over DSL
+because the paper explicitly says compiler-internal identifiers are worse.
+
+Counts are summed across every diagnostic in the .err file; tokens inside
+the GHC source-preview band are included.
+-}
 module Main (main) where
 
 import Control.Monad (forM, when)
 import Data.Char (isAlpha, isAlphaNum, isDigit, isUpper)
-import Data.List (foldl', isPrefixOf, sortBy)
+import Data.List (foldl', isPrefixOf, sort, sortBy)
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
 import Data.Maybe (mapMaybe)
 import Data.Ord (comparing)
 import JargonLists
-import System.Directory (doesFileExist)
-import System.FilePath ((</>), takeFileName)
+import System.Directory (doesDirectoryExist, doesFileExist, listDirectory)
+import System.FilePath (takeFileName, (</>))
 import System.IO (hPutStrLn, stderr)
 import Text.Printf (printf)
 
@@ -255,7 +261,8 @@ rulesFor PlutarchSide = plutarchRules
 -- ============================================================================
 
 data ErrAnalysis = ErrAnalysis
-  { eaCase :: !String
+  { eaCategory :: !String
+  , eaCase :: !String
   , eaSide :: !Side
   , eaPath :: !FilePath
   , eaDSL :: !(Map Category Int)
@@ -267,8 +274,8 @@ data ErrAnalysis = ErrAnalysis
   }
   deriving (Show)
 
-analyzeFile :: String -> Side -> FilePath -> IO ErrAnalysis
-analyzeFile caseName side path = do
+analyzeFile :: String -> String -> Side -> FilePath -> IO ErrAnalysis
+analyzeFile category caseName side path = do
   raw <- readFile path
   let toks = tokenize side raw
       dslMap = foldl' bumpDSL Map.empty toks
@@ -279,7 +286,8 @@ analyzeFile caseName side path = do
       diagCount = countDiagnostics raw
   pure
     ErrAnalysis
-      { eaCase = caseName
+      { eaCategory = category
+      , eaCase = caseName
       , eaSide = side
       , eaPath = path
       , eaDSL = dslMap
@@ -354,34 +362,43 @@ countDiagnostics input =
 -- ============================================================================
 
 topRoot :: FilePath
-topRoot = "src-errormsg-top8"
+topRoot = "src-errormsg-categories"
 
-topCases :: [String]
-topCases =
-  [ "E04-DivisionOnIntegers"
-  , "E05-BoolForInteger"
-  , "E07-WrongField"
-  , "E12-MissingAppParens"
-  , "E21-WrongPreludeFunction"
-  , "E25-InfiniteType"
-  , "E27-UnsupportedGADTs"
-  , "E29-StageError"
-  ]
-
-discoverErrors :: IO [(String, Side, FilePath)]
+{- | Cases are discovered from disk. Anything under @topRoot@ whose name
+starts with @PL-@ or @PT-@ is taken to be a case directory; the first
+three dash-separated segments (e.g. @PL-USF-01-...@ → @PL-USF@) form
+the category label reported in the CSV/Markdown.
+-}
+discoverErrors :: IO [(String, String, Side, FilePath)]
 discoverErrors = do
-  rows <- forM topCases $ \caseName -> do
-    let dir = topRoot </> caseName
-    let plinthPath = dir </> "Plinth.err"
-        plutarchPath = dir </> "Plutarch.err"
-    plinthExists <- doesFileExist plinthPath
-    plutarchExists <- doesFileExist plutarchPath
-    let plinthEntry =
-          [(caseName, PlinthSide, plinthPath) | plinthExists]
-        plutarchEntry =
-          [(caseName, PlutarchSide, plutarchPath) | plutarchExists]
-    pure (plinthEntry ++ plutarchEntry)
-  pure (concat rows)
+  exists <- doesDirectoryExist topRoot
+  if not exists
+    then pure []
+    else do
+      entries <- listDirectory topRoot
+      let caseNames = sort (filter isCaseDir entries)
+      rows <- forM caseNames $ \caseName -> do
+        let dir = topRoot </> caseName
+            category = categoryOf caseName
+            plinthPath = dir </> "Plinth.err"
+            plutarchPath = dir </> "Plutarch.err"
+        plinthExists <- doesFileExist plinthPath
+        plutarchExists <- doesFileExist plutarchPath
+        let plinthEntry =
+              [(category, caseName, PlinthSide, plinthPath) | plinthExists]
+            plutarchEntry =
+              [(category, caseName, PlutarchSide, plutarchPath) | plutarchExists]
+        pure (plinthEntry ++ plutarchEntry)
+      pure (concat rows)
+
+isCaseDir :: String -> Bool
+isCaseDir name = "PL-" `isPrefixOf` name || "PT-" `isPrefixOf` name
+
+-- | First two dash-separated segments of the case name (e.g. @PL-USF-01-Voting-GADT@ → @PL-USF@).
+categoryOf :: String -> String
+categoryOf name = case break (== '-') name of
+  (lang, '-' : rest) -> let (kind, _) = break (== '-') rest in lang ++ "-" ++ kind
+  _ -> name
 
 -- ============================================================================
 -- 8. Reporting
@@ -392,6 +409,8 @@ printAnalysis ErrAnalysis{..} = do
   putStrLn ""
   putStrLn $
     "=== "
+      ++ eaCategory
+      ++ " / "
       ++ eaCase
       ++ " / "
       ++ sideLabel eaSide
@@ -439,7 +458,7 @@ renderCSV rows =
   unlines (header : map row rows)
  where
   header =
-    "case,side,diagnostics,dsl_total,internal_total,"
+    "category,case,side,diagnostics,dsl_total,internal_total,"
       ++ "dsl_plutarch_term,dsl_plutarch_op,dsl_plutarch_type,"
       ++ "dsl_plinth_term,dsl_plinth_builtin,dsl_plinth_container,dsl_plinth_type,"
       ++ "int_banner,int_th,int_corevar,int_dict,int_qual,int_annot,"
@@ -451,7 +470,9 @@ renderCSV rows =
           ((p, ln, col) : _) -> takeFileName p ++ ":" ++ show ln ++ ":" ++ show col
           [] -> ""
      in concat
-          [ eaCase
+          [ eaCategory
+          , ","
+          , eaCase
           , ","
           , sideLabel eaSide
           , ","
@@ -493,8 +514,8 @@ renderCSV rows =
 renderMarkdown :: [ErrAnalysis] -> String
 renderMarkdown rows =
   unlines $
-    [ "| Case | Side | Diagnostics | DSL | Internal | Primary location |"
-    , "|------|------|------------:|----:|---------:|------------------|"
+    [ "| Category | Case | Side | Diagnostics | DSL | Internal | Primary location |"
+    , "|----------|------|------|------------:|----:|---------:|------------------|"
     ]
       ++ map renderRow rows
  where
@@ -505,6 +526,8 @@ renderMarkdown rows =
           [] -> "—"
      in concat
           [ "| "
+          , eaCategory
+          , " | "
           , eaCase
           , " | "
           , sideLabel eaSide
@@ -522,8 +545,12 @@ renderMarkdown rows =
 main :: IO ()
 main = do
   errs <- discoverErrors
-  rows <- forM errs $ \(caseName, side, path) -> analyzeFile caseName side path
-  let ordered = sortBy (comparing (\r -> (eaCase r, sideLabel (eaSide r)))) rows
+  rows <- forM errs $ \(category, caseName, side, path) ->
+    analyzeFile category caseName side path
+  let ordered =
+        sortBy
+          (comparing (\r -> (eaCategory r, eaCase r, sideLabel (eaSide r))))
+          rows
   mapM_ printAnalysis ordered
   putStrLn ""
   putStrLn "----- CSV -----"
@@ -535,4 +562,4 @@ main = do
     hPutStrLn stderr $
       "No .err files found under "
         ++ topRoot
-        ++ " — check src-errormsg-top8/run.sh has been executed."
+        ++ " — check src-errormsg-categories/run.sh has been executed."

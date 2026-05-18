@@ -1,0 +1,26 @@
+# source: src/Vesting/Types/VestingState.hs
+#
+# Category: Plutarch - PlutusType derivation error
+# Bug: change `PVestingDatum`'s `pvdAmount` field from
+# `Term s (PAsData PInteger)` to a raw `Term s PInteger`. The
+# `DeriveAsDataStruct` strategy requires every field's innermost
+# representation to be `PData`; an unwrapped `PInteger` fails the
+# `PInnermostIsDataDataRepr` constraint, which is wired up to a custom
+# `TypeError` saying that Data-representation can only hold types whose
+# innermost representation is PData.
+#
+# Apply with:
+#   cp <repo>/src/Vesting/Types/VestingState.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -52,7 +52,7 @@
+   { pvdBeneficiary :: Term s (PAsData PPubKeyHash)
+   , pvdStartTimestamp :: Term s (PAsData PInteger)
+   , pvdDuration :: Term s (PAsData PInteger)
+-  , pvdAmount :: Term s (PAsData PInteger)
++  , pvdAmount :: Term s PInteger
+   }
+   deriving stock (Generic)
+   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)

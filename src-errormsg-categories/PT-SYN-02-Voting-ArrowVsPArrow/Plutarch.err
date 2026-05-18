@@ -1,0 +1,44 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-02-Voting-ArrowVsPArrow/Plutarch.hs:29:25-29: error: [GHC-83865]
+    • Expecting one more argument to ‘PData’
+      Expected a type, but ‘PData’ has kind ‘S -> *’
+    • In the second argument of ‘Term’, namely
+        ‘(PData -> PData -> PData -> PBool)’
+      In the type signature:
+        pvalueHasNFT :: Term s (PData -> PData -> PData -> PBool)
+   |
+29 | pvalueHasNFT :: Term s (PData -> PData -> PData -> PBool)
+   |                         ^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-02-Voting-ArrowVsPArrow/Plutarch.hs:29:34-38: error: [GHC-83865]
+    • Expecting one more argument to ‘PData’
+      Expected a type, but ‘PData’ has kind ‘S -> *’
+    • In the second argument of ‘Term’, namely
+        ‘(PData -> PData -> PData -> PBool)’
+      In the type signature:
+        pvalueHasNFT :: Term s (PData -> PData -> PData -> PBool)
+   |
+29 | pvalueHasNFT :: Term s (PData -> PData -> PData -> PBool)
+   |                                  ^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-02-Voting-ArrowVsPArrow/Plutarch.hs:29:43-47: error: [GHC-83865]
+    • Expecting one more argument to ‘PData’
+      Expected a type, but ‘PData’ has kind ‘S -> *’
+    • In the second argument of ‘Term’, namely
+        ‘(PData -> PData -> PData -> PBool)’
+      In the type signature:
+        pvalueHasNFT :: Term s (PData -> PData -> PData -> PBool)
+   |
+29 | pvalueHasNFT :: Term s (PData -> PData -> PData -> PBool)
+   |                                           ^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-02-Voting-ArrowVsPArrow/Plutarch.hs:29:52-56: error: [GHC-83865]
+    • Expecting one more argument to ‘PBool’
+      Expected a type, but ‘PBool’ has kind ‘S -> *’
+    • In the second argument of ‘Term’, namely
+        ‘(PData -> PData -> PData -> PBool)’
+      In the type signature:
+        pvalueHasNFT :: Term s (PData -> PData -> PData -> PBool)
+   |
+29 | pvalueHasNFT :: Term s (PData -> PData -> PData -> PBool)
+   |                                                    ^^^^^

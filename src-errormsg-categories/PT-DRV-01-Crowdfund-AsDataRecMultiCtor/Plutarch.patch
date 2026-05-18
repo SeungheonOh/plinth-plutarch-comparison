@@ -1,0 +1,25 @@
+# source: src/Crowdfund/Types/CrowdfundState.hs
+#
+# Category: Plutarch - PlutusType derivation error
+# Bug: `PCrowdfundRedeemer` has three constructors (`PDonate`,
+# `PWithdraw`, `PReclaim`). Switching the deriving strategy from
+# `DeriveAsDataStruct` to `DeriveAsDataRec` triggers the
+# `RecTypePrettyError` type family, which is exactly designed to reject
+# multi-constructor types because record encoding (a flat list of
+# fields) has no place for a constructor tag.
+#
+# Apply with:
+#   cp <repo>/src/Crowdfund/Types/CrowdfundState.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -116,7 +116,7 @@
+   | PReclaim
+   deriving stock (Generic)
+   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+-  deriving (PlutusType) via (DeriveAsDataStruct PCrowdfundRedeemer)
++  deriving (PlutusType) via (DeriveAsDataRec PCrowdfundRedeemer)
+
+ deriving via
+   DeriveDataPLiftable PCrowdfundRedeemer CrowdfundRedeemer

@@ -1,0 +1,50 @@
+# source: src/Hydra/Contracts/HeadPlinth.hs
+#
+# Category: Plinth - Unsupported Haskell feature
+# Bug: declare an existential data type and use it inside a `plinthc`
+# binding. Plinth's PIR has no representation for existentials -
+# constructors with `forall a. ...` style quantification produce
+# witnesses Plinth cannot encode, and the plugin aborts with an
+# unsupported-feature diagnostic when it tries to compile the
+# constructor.
+#
+# Apply with:
+#   cp <repo>/src/Hydra/Contracts/HeadPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -1,3 +1,4 @@
++{-# LANGUAGE ExistentialQuantification #-}
+ {-# LANGUAGE NamedFieldPuns #-}
+ {-# LANGUAGE OverloadedStrings #-}
+ {-# LANGUAGE NoImplicitPrelude #-}
+@@ -11,6 +12,7 @@
+ 
+ module Hydra.Contracts.HeadPlinth (
+   plinthHeadScript,
++  plinthExistentialScript,
+ ) where
+ 
+ import Plinth.Plugin
+@@ -819,3 +821,20 @@
+ plinthHeadScript :: Script
+ plinthHeadScript =
+   compiledCodeToScript $ plinthc mkHeadValidator
++
++-- BUG: an existential box is packed in an INLINEABLE helper and
++-- consumed by a `plinthc`-compiled validator. Plinth's PIR cannot
++-- encode the witness dictionary that hides the existential `a`, so
++-- the plugin aborts when it tries to translate the constructor.
++data Boxed = forall a. Boxed a (a -> Integer)
++
++{-# INLINEABLE openBoxed #-}
++openBoxed :: Boxed -> Integer
++openBoxed (Boxed a f) = f a
++
++{-# INLINEABLE existEntry #-}
++existEntry :: BuiltinData -> ()
++existEntry _ = if openBoxed (Boxed (42 :: Integer) (\x -> x + 1)) == 43 then () else error ()
++
++plinthExistentialScript :: Script
++plinthExistentialScript = compiledCodeToScript $ plinthc existEntry

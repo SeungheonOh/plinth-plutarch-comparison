@@ -1,0 +1,26 @@
+# source: src/Crowdfund/Contracts/Crowdfund.hs
+#
+# Category: Plutarch - let/plet, ->/:--> mix-up
+# Bug: in `plistLength`, the Plutarch term-application `#` is replaced
+# with Haskell's `$`. `pfix` and `plam` produce Plutarch terms whose
+# arrows are `:-->`, not Haskell `->`, so they can only be combined via
+# Plutarch's term-level `#`/`#$`. Using Haskell-level `$` reads as
+# "apply a Plutarch term to another Plutarch term as if they were
+# Haskell values", which fails with a "couldn't match Term s (X :--> Y)
+# with X" pair of diagnostics.
+#
+# Apply with:
+#   cp <repo>/src/Crowdfund/Contracts/Crowdfund.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -27,7 +27,7 @@
+ pcheck b = pif b (pconstant ()) perror
+
+ plistLength :: (PIsListLike l a) => Term s (l a :--> PInteger)
+-plistLength = phoistAcyclic $ pfix #$ plam $ \self xs ->
++plistLength = phoistAcyclic $ pfix $ plam $ \self xs ->
+   pelimList (\_ rest -> 1 + self # rest) 0 xs
+
+ -- ============================================================================

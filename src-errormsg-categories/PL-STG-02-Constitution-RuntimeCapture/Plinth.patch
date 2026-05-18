@@ -1,0 +1,39 @@
+# source: src/Constitution/Contracts/ConstitutionSortedPlinth.hs
+#
+# Category: Plinth - Stage error
+# Bug: append `mkThresholdValidator` which lets `threshold` (a runtime
+# `Integer` parameter) flow into the lambda handed to `plinthc`. The
+# Plinth plugin compiles only the inner lambda; `threshold` is a
+# Haskell-level binding in the enclosing function, so the plugin
+# reports a stage error at the captured name.
+#
+# Apply with:
+#   cp <repo>/src/Constitution/Contracts/ConstitutionSortedPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -11,6 +11,7 @@
+ 
+ module Constitution.Contracts.ConstitutionSortedPlinth (
+   plinthConstitutionScript,
++  plinthThresholdScript,
+ ) where
+ 
+ import Plinth.Plugin
+@@ -185,3 +186,15 @@
+ plinthConstitutionScript :: Script
+ plinthConstitutionScript =
+   compiledCodeToScript $ plinthc mkConstitutionValidator
++
++-- BUG: `mkThresholdValidator` takes a Haskell-level Integer parameter
++-- `threshold` and feeds it into a `plinthc`-compiled lambda. The
++-- plugin tries to compile `\actual -> ... threshold ...` and finds
++-- `threshold` is not local to the lambda, not a builtin, and not an
++-- INLINEABLE binding. Stage error at the captured name.
++{-# INLINABLE mkThresholdValidator #-}
++mkThresholdValidator :: Integer -> PlutusTx.CompiledCode (Integer -> ())
++mkThresholdValidator threshold = plinthc (\actual -> if actual > threshold then () else error ())
++
++plinthThresholdScript :: Script
++plinthThresholdScript = compiledCodeToScript (mkThresholdValidator 1000)

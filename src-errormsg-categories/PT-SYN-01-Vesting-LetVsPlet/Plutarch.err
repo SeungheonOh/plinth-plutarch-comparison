@@ -1,0 +1,88 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:201:35-65: error: [GHC-83865]
+    • Couldn't match expected type: TermCont
+                                      s (Term s (PBuiltinList (PAsData PTxInInfo)))
+                  with actual type: (Term s (PBuiltinList (PAsData PTxInInfo))
+                                     -> Term s b0)
+                                    -> Term s b0
+    • Probable cause: ‘plet’ is applied to too few arguments
+      In a stmt of a 'do' block:
+        inputs <- plet (pfromData ptxInfo'inputs)
+      In the second argument of ‘($)’, namely
+        ‘do inputs <- plet (pfromData ptxInfo'inputs)
+            outputs <- plet (pfromData ptxInfo'outputs)
+            PTxInInfo {ptxInInfo'resolved} <- pmatchC
+                                                (pfindOwnInput # inputs # ownRef)
+            ownResolved <- pletC ptxInInfo'resolved
+            ....’
+      In the second argument of ‘pif’, namely
+        ‘(unTermCont
+            $ do inputs <- plet (pfromData ptxInfo'inputs)
+                 outputs <- plet (pfromData ptxInfo'outputs)
+                 PTxInInfo {ptxInInfo'resolved} <- pmatchC
+                                                     (pfindOwnInput # inputs # ownRef)
+                 ownResolved <- pletC ptxInInfo'resolved
+                 ....)’
+    • Relevant bindings include
+        ptxInfo'signatories :: Term
+                                 s (PAsData (PBuiltinList (PAsData PPubKeyHash)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:194:21)
+        ptxInfo'validRange :: Term s (PInterval PPosixTime)
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:193:21)
+        ptxInfo'fee :: Term s (PAsData PLovelace)
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:192:21)
+        ptxInfo'outputs :: Term s (PAsData (PBuiltinList (PAsData PTxOut)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:191:21)
+        ptxInfo'inputs :: Term
+                            s (PAsData (PBuiltinList (PAsData PTxInInfo)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:190:21)
+        beneficiary :: Term s PPubKeyHash
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:185:21)
+        (Some bindings suppressed; use -fmax-relevant-binds=N or -fno-max-relevant-binds)
+    |
+201 |                         inputs <- plet (pfromData ptxInfo'inputs)
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:202:36-67: error: [GHC-83865]
+    • Couldn't match expected type: TermCont
+                                      s (Term s (PBuiltinList (PAsData PTxOut)))
+                  with actual type: (Term s (PBuiltinList (PAsData PTxOut))
+                                     -> Term s b1)
+                                    -> Term s b1
+    • Probable cause: ‘plet’ is applied to too few arguments
+      In a stmt of a 'do' block:
+        outputs <- plet (pfromData ptxInfo'outputs)
+      In the second argument of ‘($)’, namely
+        ‘do inputs <- plet (pfromData ptxInfo'inputs)
+            outputs <- plet (pfromData ptxInfo'outputs)
+            PTxInInfo {ptxInInfo'resolved} <- pmatchC
+                                                (pfindOwnInput # inputs # ownRef)
+            ownResolved <- pletC ptxInInfo'resolved
+            ....’
+      In the second argument of ‘pif’, namely
+        ‘(unTermCont
+            $ do inputs <- plet (pfromData ptxInfo'inputs)
+                 outputs <- plet (pfromData ptxInfo'outputs)
+                 PTxInInfo {ptxInInfo'resolved} <- pmatchC
+                                                     (pfindOwnInput # inputs # ownRef)
+                 ownResolved <- pletC ptxInInfo'resolved
+                 ....)’
+    • Relevant bindings include
+        inputs :: Term s (PBuiltinList (PAsData PTxInInfo))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:201:25)
+        ptxInfo'signatories :: Term
+                                 s (PAsData (PBuiltinList (PAsData PPubKeyHash)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:194:21)
+        ptxInfo'validRange :: Term s (PInterval PPosixTime)
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:193:21)
+        ptxInfo'fee :: Term s (PAsData PLovelace)
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:192:21)
+        ptxInfo'outputs :: Term s (PAsData (PBuiltinList (PAsData PTxOut)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:191:21)
+        ptxInfo'inputs :: Term
+                            s (PAsData (PBuiltinList (PAsData PTxInInfo)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-01-Vesting-LetVsPlet/Plutarch.hs:190:21)
+        (Some bindings suppressed; use -fmax-relevant-binds=N or -fno-max-relevant-binds)
+    |
+202 |                         outputs <- plet (pfromData ptxInfo'outputs)
+    |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -1,0 +1,26 @@
+# source: src/Crowdfund/Contracts/Crowdfund.hs
+#
+# Category: Plutarch - PAsData wrap/unwrap confusion
+# Bug: drop the `pdata` wrapper on the RHS of the wallets-equality
+# check during reclaim. `outWallets` is a destructured field of type
+# `Term s (PAsData (PMap 'Unsorted PPubKeyHash PInteger))` (since
+# `PCrowdfundDatum` is data-encoded), while the RHS expression yields
+# the unwrapped `Term s (PMap 'Unsorted ...)`. Without `pdata` to lift
+# the RHS into the same `PAsData` envelope, `#==` complains that the
+# two operands have different types.
+#
+# Apply with:
+#   cp <repo>/src/Crowdfund/Contracts/Crowdfund.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -310,7 +310,7 @@
+                                       #&& outDeadline
+                                       #== pcfDeadline
+                                       #&& outWallets
+-                                      #== pdata (pfilterOutKey # currentSigner # wallets)
++                                      #== (pfilterOutKey # currentSigner # wallets)
+                       )
+                 )
+                 (plistLength # contractOutputs #== 0)

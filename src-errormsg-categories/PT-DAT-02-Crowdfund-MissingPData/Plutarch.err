@@ -1,0 +1,22 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DAT-02-Crowdfund-MissingPData/Plutarch.hs:313:44-56: error: [GHC-83865]
+    • Couldn't match type: PMap Unsorted PPubKeyHash PInteger
+                     with: PAsData (PMap Unsorted PPubKeyHash PInteger)
+      Expected: Term
+                  s'
+                  (PPubKeyHash
+                   :--> (PMap Unsorted PPubKeyHash PInteger
+                         :--> PAsData (PMap Unsorted PPubKeyHash PInteger)))
+        Actual: Term
+                  s'
+                  (PPubKeyHash
+                   :--> (PMap Unsorted PPubKeyHash PInteger
+                         :--> PMap Unsorted PPubKeyHash PInteger))
+    • In the first argument of ‘(#)’, namely ‘pfilterOutKey’
+      In the first argument of ‘(#)’, namely
+        ‘pfilterOutKey # currentSigner’
+      In the second argument of ‘(#==)’, namely
+        ‘(pfilterOutKey # currentSigner # wallets)’
+    |
+313 |                                       #== (pfilterOutKey # currentSigner # wallets)
+    |                                            ^^^^^^^^^^^^^

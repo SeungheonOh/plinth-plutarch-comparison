@@ -1,0 +1,34 @@
+# source: src/Vesting/Types/VestingState.hs
+#
+# Category: Plutarch - PlutusType derivation error
+# Bug: change `PVestingRedeemer`'s deriving strategy from
+# `DeriveAsDataStruct` to `DeriveAsTag`. `DeriveAsTag` requires every
+# constructor to have no arguments (an "enumeration" type), but
+# `PRelease` carries a `Term s (PAsData PInteger)`. The `TagTypePrettyError`
+# type family then prints an explicit "DeriveAsTag only supports
+# constructors without arguments" diagnostic pinpointing the offending
+# constructor.
+#
+# Apply with:
+#   cp <repo>/src/Vesting/Types/VestingState.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -14,6 +14,7 @@
+ import Plutarch.Internal.Lift ()
+ import Plutarch.LedgerApi.V3 (PPubKeyHash)
+ import Plutarch.Prelude
++import Plutarch.Repr.Tag (DeriveAsTag)
+ import PlutusLedgerApi.V3 (PubKeyHash)
+ import PlutusTx qualified
+ import PlutusTx.AsData qualified as PlutusTx
+@@ -70,7 +71,7 @@
+ newtype PVestingRedeemer (s :: S) = PRelease (Term s (PAsData PInteger))
+   deriving stock (Generic)
+   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+-  deriving (PlutusType) via (DeriveAsDataStruct PVestingRedeemer)
++  deriving (PlutusType) via (DeriveAsTag PVestingRedeemer)
+
+ deriving via
+   DeriveDataPLiftable PVestingRedeemer VestingRedeemer

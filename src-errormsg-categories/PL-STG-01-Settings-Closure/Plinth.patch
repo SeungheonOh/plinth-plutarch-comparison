@@ -1,0 +1,37 @@
+# source: src/Settings/Contracts/SettingsPlinth.hs
+#
+# Category: Plinth - Stage error
+# Bug: hand `plinthc` a lambda that captures a runtime parameter `n`. The
+# Plinth plugin compiles the lambda body in isolation and finds `n` is not
+# a local, builtin, or external INLINEABLE binding.
+#
+# Apply with:
+#   cp <repo>/src/Settings/Contracts/SettingsPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -18,6 +18,7 @@
+
+ module Settings.Contracts.SettingsPlinth (
+   plinthSettingsScript,
++  plinthScaledFeeScript,
+ ) where
+
+ import Plinth.Plugin
+@@ -339,3 +340,15 @@
+ plinthSettingsScript :: Script
+ plinthSettingsScript =
+   compiledCodeToScript $ plinthc mkSettingsValidator
++
++-- BUG: `plinthc` is fed a lambda that closes over the Haskell-level
++-- parameter `multiplier`. At Core->PIR conversion the plugin asks
++-- "where is `multiplier` defined?" and the answer is "nowhere visible to
++-- the plugin", so it reports a stage error pointing at the captured name.
++{-# INLINABLE mkScaledFee #-}
++mkScaledFee :: Integer -> PlutusTx.CompiledCode (Integer -> Integer)
++mkScaledFee multiplier = plinthc (\fee -> fee * multiplier)
++
++plinthScaledFeeScript :: Script
++plinthScaledFeeScript =
++  compiledCodeToScript (mkScaledFee 3)

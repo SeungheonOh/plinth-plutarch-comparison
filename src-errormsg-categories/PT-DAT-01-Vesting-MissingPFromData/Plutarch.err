@@ -1,0 +1,46 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DAT-01-Vesting-MissingPFromData/Plutarch.hs:199:72-82: error: [GHC-83865]
+    • Couldn't match type ‘PAsData PPubKeyHash’ with ‘PPubKeyHash’
+      Expected: Term s PPubKeyHash
+        Actual: Term s (PAsData PPubKeyHash)
+    • In the second argument of ‘(#)’, namely ‘beneficiary’
+      In the first argument of ‘pif’, namely
+        ‘(pmustBeSignedBy # pfromData ptxInfo'signatories # beneficiary)’
+      In the second argument of ‘($)’, namely
+        ‘pif
+           (pmustBeSignedBy # pfromData ptxInfo'signatories # beneficiary)
+           (unTermCont
+              $ do inputs <- pletC (pfromData ptxInfo'inputs)
+                   outputs <- pletC (pfromData ptxInfo'outputs)
+                   PTxInInfo {ptxInInfo'resolved} <- pmatchC
+                                                       (pfindOwnInput # inputs # ownRef)
+                   ownResolved <- pletC ptxInInfo'resolved
+                   ....)
+           perror’
+    |
+199 |                     (pmustBeSignedBy # pfromData ptxInfo'signatories # beneficiary)
+    |                                                                        ^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DAT-01-Vesting-MissingPFromData/Plutarch.hs:221:75-85: error: [GHC-83865]
+    • Couldn't match type ‘PAsData PPubKeyHash’ with ‘PPubKeyHash’
+      Expected: Term s PPubKeyHash
+        Actual: Term s (PAsData PPubKeyHash)
+    • In the second argument of ‘(#)’, namely ‘beneficiary’
+      In the expression: pfoldAdaByVkhOutputs # outputs # beneficiary
+      In an equation for ‘beneAdaOut’:
+          beneAdaOut = pfoldAdaByVkhOutputs # outputs # beneficiary
+    |
+221 |                             beneAdaOut = pfoldAdaByVkhOutputs # outputs # beneficiary
+    |                                                                           ^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DAT-01-Vesting-MissingPFromData/Plutarch.hs:222:72-82: error: [GHC-83865]
+    • Couldn't match type ‘PAsData PPubKeyHash’ with ‘PPubKeyHash’
+      Expected: Term s PPubKeyHash
+        Actual: Term s (PAsData PPubKeyHash)
+    • In the second argument of ‘(#)’, namely ‘beneficiary’
+      In the expression: pfoldAdaByVkhInputs # inputs # beneficiary
+      In an equation for ‘beneAdaIn’:
+          beneAdaIn = pfoldAdaByVkhInputs # inputs # beneficiary
+    |
+222 |                             beneAdaIn = pfoldAdaByVkhInputs # inputs # beneficiary
+    |                                                                        ^^^^^^^^^^^

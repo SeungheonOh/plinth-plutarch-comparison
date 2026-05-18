@@ -1,0 +1,47 @@
+# source: src/Voting/Contracts/VotingPlinth.hs
+#
+# Category: Plinth - Unsupported Haskell feature
+# Bug: enable GADTs and define a GADT used inside a `plinthc`-compiled
+# binding. Plinth's Core->PIR stage rejects the GADTs extension.
+#
+# Apply with:
+#   cp <repo>/src/Voting/Contracts/VotingPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -1,3 +1,4 @@
++{-# LANGUAGE GADTs #-}
+ {-# LANGUAGE OverloadedStrings #-}
+ {-# LANGUAGE Strict #-}
+ {-# LANGUAGE NoImplicitPrelude #-}
+@@ -11,6 +12,7 @@
+
+ module Voting.Contracts.VotingPlinth (
+   plinthVotingScript,
++  plinthBuggyScript,
+ ) where
+
+ import Plinth.Plugin
+@@ -113,3 +115,21 @@
+ plinthVotingScript :: Script
+ plinthVotingScript =
+   compiledCodeToScript $ plinthc mkVotingValidator
++
++-- BUG: a small GADT and a `plinthc`-compiled binding that uses it.
++-- Plinth refuses GADTs because they cannot be encoded in PIR's type system,
++-- so this aborts at the plugin stage with the GADTs extension diagnostic.
++data Witness a where
++  WInt  :: Witness Integer
++  WBool :: Witness Bool
++
++{-# INLINEABLE evalWitness #-}
++evalWitness :: Witness Integer -> Integer
++evalWitness WInt = 0
++
++{-# INLINEABLE buggyEntry #-}
++buggyEntry :: BuiltinData -> ()
++buggyEntry _ = if evalWitness WInt == 0 then () else error ()
++
++plinthBuggyScript :: Script
++plinthBuggyScript = compiledCodeToScript $ plinthc buggyEntry

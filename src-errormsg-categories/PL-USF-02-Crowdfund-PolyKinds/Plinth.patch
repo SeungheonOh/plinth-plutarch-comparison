@@ -1,0 +1,52 @@
+# source: src/Crowdfund/Contracts/CrowdfundPlinth.hs
+#
+# Category: Plinth - Unsupported Haskell feature
+# Bug: enable PolyKinds and use a polykinded `Proxy'` inside a
+# `plinthc`-compiled validator. Plinth's plugin has an explicit
+# `extensionBlacklist` containing exactly `GADTs` and `PolyKinds`,
+# so it aborts at the start of `runCompiler` with
+# "Following extensions are not supported: PolyKinds".
+#
+# Apply with:
+#   cp <repo>/src/Crowdfund/Contracts/CrowdfundPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -1,5 +1,6 @@
+ {-# LANGUAGE OverloadedStrings #-}
+ {-# LANGUAGE PatternSynonyms #-}
++{-# LANGUAGE PolyKinds #-}
+ {-# LANGUAGE ViewPatterns #-}
+ {-# LANGUAGE NoImplicitPrelude #-}
+ {-# OPTIONS_GHC -Wno-missing-import-lists -Wno-missing-export-lists -Wno-missing-deriving-strategies #-}
+@@ -10,6 +11,7 @@
+ 
+ module Crowdfund.Contracts.CrowdfundPlinth (
+   plinthCrowdfundScript,
++  plinthPolyKindsScript,
+ ) where
+ 
+ import Plutarch.Script (Script (..))
+@@ -313,3 +315,21 @@
+ plinthCrowdfundScript :: Script
+ plinthCrowdfundScript =
+   compiledCodeToScript $ plinthc mkCrowdfundValidator
++
++-- BUG: a polykinded type abstraction is consumed inside a `plinthc`
++-- binding. With `PolyKinds` enabled, GHC infers kind variables in
++-- the signature of `Proxy'`/`unProxy'`, and the Plinth plugin's
++-- explicit `extensionBlacklist` rejects the `PolyKinds` extension at
++-- the start of `runCompiler` before any compilation can happen.
++data Proxy' a = Proxy'
++
++{-# INLINEABLE unProxy' #-}
++unProxy' :: Proxy' a -> Integer
++unProxy' Proxy' = 1
++
++{-# INLINEABLE polyKindsEntry #-}
++polyKindsEntry :: BuiltinData -> ()
++polyKindsEntry _ = if unProxy' (Proxy' :: Proxy' Integer) == 1 then () else error ()
++
++plinthPolyKindsScript :: Script
++plinthPolyKindsScript = compiledCodeToScript $ plinthc polyKindsEntry

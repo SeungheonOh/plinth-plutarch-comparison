@@ -1,0 +1,26 @@
+# source: src/Voting/Contracts/Voting.hs
+#
+# Category: Plutarch - let/plet, ->/:--> mix-up
+# Bug: `pvalueHasNFT` is given a Haskell function arrow `->` between
+# Plutarch types instead of the Plutarch level arrow `:-->`. Plutarch
+# function arrows are type constructors of kind `S -> S -> S`, while
+# Haskell `->` produces a kind `Type` arrow. Stuffing
+# `Term s (PData -> PData -> ...)` reads as "Term containing a Haskell
+# function" and clashes everywhere downstream (`#`, `phoistAcyclic`,
+# `plam`, etc.) with the expected `Term s (PData :--> ...)`.
+#
+# Apply with:
+#   cp <repo>/src/Voting/Contracts/Voting.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -26,7 +26,7 @@
+ -- 2. Utility functions
+ -- ============================================================================
+
+-pvalueHasNFT :: Term s (PData :--> PData :--> PData :--> PBool)
++pvalueHasNFT :: Term s (PData -> PData -> PData -> PBool)
+ pvalueHasNFT = phoistAcyclic $ plam $ \csData tnData valueData ->
+   let outerMap = pasMap # valueData
+    in pfindCSEntry # csData # tnData # outerMap

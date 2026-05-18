@@ -1,0 +1,39 @@
+# source: src/Crowdfund/Contracts/CrowdfundPlinth.hs
+#
+# Category: Plinth - Stage error
+# Bug: append `mkBoundedValidator` which lets a Haskell-level `cap`
+# parameter slip into the lambda passed to `plinthc`. The plugin
+# compiles `mount -> ... cap ...` in isolation and reports a stage
+# error because `cap` is bound in the enclosing Haskell scope, not in
+# the lambda.
+#
+# Apply with:
+#   cp <repo>/src/Crowdfund/Contracts/CrowdfundPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -10,6 +10,7 @@
+ 
+ module Crowdfund.Contracts.CrowdfundPlinth (
+   plinthCrowdfundScript,
++  plinthBoundedScript,
+ ) where
+ 
+ import Plutarch.Script (Script (..))
+@@ -313,3 +314,15 @@
+ plinthCrowdfundScript :: Script
+ plinthCrowdfundScript =
+   compiledCodeToScript $ plinthc mkCrowdfundValidator
++
++-- BUG: `mkBoundedValidator` takes a Haskell-level `cap` and embeds it
++-- in the body of a `plinthc`-compiled lambda. The Plinth plugin
++-- compiles only the lambda; at the captured reference to `cap` the
++-- plugin's stage check fires because `cap` is not local to the
++-- lambda, not a builtin, and not an INLINEABLE binding.
++{-# INLINABLE mkBoundedValidator #-}
++mkBoundedValidator :: Integer -> PlutusTx.CompiledCode (Integer -> ())
++mkBoundedValidator cap = plinthc (\amount -> if amount < cap then () else error ())
++
++plinthBoundedScript :: Script
++plinthBoundedScript = compiledCodeToScript (mkBoundedValidator 5_000_000)
