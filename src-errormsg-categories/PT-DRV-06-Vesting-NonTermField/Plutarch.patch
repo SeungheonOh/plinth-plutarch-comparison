@@ -1,0 +1,26 @@
+# source: src/Vesting/Types/VestingState.hs
+#
+# Category: Plutarch - PlutusType derivation error
+# Bug: change one field of `PVestingDatum` from a Plutarch term
+# (`Term s (PAsData PInteger)`) to a raw Haskell `Integer`. The
+# `DeriveAsDataStruct` strategy expects every field of an SOP-encoded
+# record to be a `Term s X`, because its `PInner` representation walks
+# a `LiftedCoercible (Term s) I` constraint over the SOP code. An
+# unwrapped `Integer` field breaks that constraint and GHC reports the
+# coercion failure inside the `PlutusType` derivation block.
+#
+# Apply with:
+#   cp <repo>/src/Vesting/Types/VestingState.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -52,7 +52,7 @@
+   { pvdBeneficiary :: Term s (PAsData PPubKeyHash)
+   , pvdStartTimestamp :: Term s (PAsData PInteger)
+   , pvdDuration :: Term s (PAsData PInteger)
+-  , pvdAmount :: Term s (PAsData PInteger)
++  , pvdAmount :: Integer
+   }
+   deriving stock (Generic)
+   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)

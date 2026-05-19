@@ -1,0 +1,188 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:195:22-32: error: [GHC-05617]
+    • Could not solve: (Data.SOP.Constraint.AllF
+                          SOP.SListI
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s)) '[]),
+                        Data.SOP.Constraint.AllF
+                          SOP.Top
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s)) '[]))
+        arising from a superclass required to satisfy ‘SOP.All
+                                                         SOP.SListI
+                                                         (Generics.SOP.GGP.ToSumCode
+                                                            (GHC.Generics.Rep (PSettingsDatum s))
+                                                            '[])’,
+        arising from the 'deriving' clause of a data type declaration
+    • When deriving the instance for (SOP.Generic (PSettingsDatum s))
+    |
+195 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+    |                      ^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:195:22-32: error: [GHC-39999]
+    • No instance for ‘Generics.SOP.GGP.GSumFrom
+                         (GHC.Generics.Rep (PSettingsDatum s))’
+        arising from the 'deriving' clause of a data type declaration
+      Possible fix:
+        use a standalone 'deriving instance' declaration,
+          so you can specify the instance context yourself
+    • When deriving the instance for (SOP.Generic (PSettingsDatum s))
+    |
+195 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+    |                      ^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:195:44-46: error: [GHC-39999]
+    • No instance for ‘SOP.All
+                         (SOP.All PEq)
+                         (Plutarch.Internal.TypeFamily.ToPType2
+                            (Generics.SOP.GGP.ToSumCode
+                               (GHC.Generics.Rep (PSettingsDatum GHC.Types.Any)) '[]))’
+        arising from the 'deriving' clause of a data type declaration
+      Possible fix:
+        use a standalone 'deriving instance' declaration,
+          so you can specify the instance context yourself
+    • When deriving the instance for (PEq PSettingsDatum)
+    |
+195 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+    |                                            ^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:195:44-46: error: [GHC-05617]
+    • Could not solve: (Data.SOP.Constraint.AllF
+                          (SOP.All SOP.Top)
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s1)) '[]),
+                        Data.SOP.Constraint.AllF
+                          SOP.Top
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s1)) '[]))
+        arising from a superclass required to satisfy ‘SOP.All
+                                                         (SOP.All SOP.Top)
+                                                         (Generics.SOP.GGP.ToSumCode
+                                                            (GHC.Generics.Rep (PSettingsDatum s1))
+                                                            '[])’,
+        arising from the head of a quantified constraint
+        arising from the 'deriving' clause of a data type declaration
+    • When deriving the instance for (PEq PSettingsDatum)
+    |
+195 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+    |                                            ^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:195:44-46: error: [GHC-39999]
+    • No instance for ‘Generic (PSettingsDatum s1)’
+        arising from the head of a quantified constraint
+        arising from the 'deriving' clause of a data type declaration
+    • When deriving the instance for (PEq PSettingsDatum)
+    |
+195 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+    |                                            ^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:195:49-53: error: [GHC-39999]
+    • No instance for ‘SOP.All
+                         (SOP.All PShow)
+                         (Plutarch.Internal.TypeFamily.ToPType2
+                            (Generics.SOP.GGP.ToSumCode
+                               (GHC.Generics.Rep (PSettingsDatum GHC.Types.Any)) '[]))’
+        arising from the 'deriving' clause of a data type declaration
+      Possible fix:
+        use a standalone 'deriving instance' declaration,
+          so you can specify the instance context yourself
+    • When deriving the instance for (PShow PSettingsDatum)
+    |
+195 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+    |                                                 ^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:195:49-53: error: [GHC-05617]
+    • Could not solve: (Data.SOP.Constraint.AllF
+                          (SOP.All SOP.Top)
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s1)) '[]),
+                        Data.SOP.Constraint.AllF
+                          SOP.Top
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s1)) '[]))
+        arising from a superclass required to satisfy ‘SOP.All
+                                                         (SOP.All SOP.Top)
+                                                         (Generics.SOP.GGP.ToSumCode
+                                                            (GHC.Generics.Rep (PSettingsDatum s1))
+                                                            '[])’,
+        arising from the head of a quantified constraint
+        arising from the 'deriving' clause of a data type declaration
+    • When deriving the instance for (PShow PSettingsDatum)
+    |
+195 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+    |                                                 ^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:195:49-53: error: [GHC-39999]
+    • No instance for ‘Generic (PSettingsDatum s1)’
+        arising from the head of a quantified constraint
+        arising from the 'deriving' clause of a data type declaration
+    • When deriving the instance for (PShow PSettingsDatum)
+    |
+195 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+    |                                                 ^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:196:13-22: error: [GHC-39999]
+    • No instance for ‘SOP.All
+                         (SOP.All Plutarch.Repr.Data.PInnermostIsDataDataRepr)
+                         (Plutarch.Repr.Internal.UnTermStruct'
+                            (Generics.SOP.GGP.ToSumCode
+                               (GHC.Generics.Rep (PSettingsDatum GHC.Types.Any)) '[]))’
+        arising from the 'deriving' clause of a data type declaration
+      Possible fix:
+        use a standalone 'deriving instance' declaration,
+          so you can specify the instance context yourself
+    • When deriving the instance for (PlutusType PSettingsDatum)
+    |
+196 |   deriving (PlutusType) via (DeriveAsDataStruct PSettingsDatum)
+    |             ^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:196:13-22: error: [GHC-05617]
+    • Could not solve: (Data.SOP.Constraint.AllZipF
+                          (SOP.AllZip (SOP.LiftedCoercible SOP.I (Term s)))
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s)) '[])
+                          (Plutarch.Repr.Internal.UnTermStruct'
+                             (Generics.SOP.GGP.ToSumCode
+                                (GHC.Generics.Rep (PSettingsDatum GHC.Types.Any)) '[])),
+                        Data.SOP.Constraint.AllZipF
+                          (SOP.AllZip (SOP.LiftedCoercible (Term s) SOP.I))
+                          (Plutarch.Repr.Internal.UnTermStruct'
+                             (Generics.SOP.GGP.ToSumCode
+                                (GHC.Generics.Rep (PSettingsDatum GHC.Types.Any)) '[]))
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s)) '[]),
+                        SOP.SameShapeAs
+                          (Plutarch.Repr.Internal.UnTermStruct'
+                             (Generics.SOP.GGP.ToSumCode
+                                (GHC.Generics.Rep (PSettingsDatum GHC.Types.Any)) '[]))
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s)) '[]),
+                        SOP.SameShapeAs
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s)) '[])
+                          (Plutarch.Repr.Internal.UnTermStruct'
+                             (Generics.SOP.GGP.ToSumCode
+                                (GHC.Generics.Rep (PSettingsDatum GHC.Types.Any)) '[])),
+                        Data.SOP.Constraint.AllF
+                          SOP.Top
+                          (Generics.SOP.GGP.ToSumCode
+                             (GHC.Generics.Rep (PSettingsDatum s)) '[]))
+        arising from the head of a quantified constraint
+        arising from the 'deriving' clause of a data type declaration
+    • When deriving the instance for (PlutusType PSettingsDatum)
+    |
+196 |   deriving (PlutusType) via (DeriveAsDataStruct PSettingsDatum)
+    |             ^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-04-Settings-MissingGenericStock/Plutarch.hs:196:13-22: error: [GHC-39999]
+    • No instance for ‘SOP.All
+                         SOP.Top
+                         (Plutarch.Repr.Internal.UnTermStruct'
+                            (Generics.SOP.GGP.ToSumCode
+                               (GHC.Generics.Rep (PSettingsDatum GHC.Types.Any)) '[]))’
+        arising from the head of a quantified constraint
+        arising from the 'deriving' clause of a data type declaration
+    • When deriving the instance for (PlutusType PSettingsDatum)
+    |
+196 |   deriving (PlutusType) via (DeriveAsDataStruct PSettingsDatum)
+    |             ^^^^^^^^^^

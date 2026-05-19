@@ -1,0 +1,37 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-06-Voting-EqVsHashEq/Plutarch.hs:39:12-39: error: [GHC-83865]
+    • Couldn't match expected type ‘Term s' PBool’
+                  with actual type ‘Bool’
+    • In the first argument of ‘pif’, namely
+        ‘(pfstBuiltin # pair == csData)’
+      In the expression:
+        pif
+          (pfstBuiltin # pair == csData)
+          (pfindTNEntry # tnData # (pasMap # (psndBuiltin # pair)))
+          (self # csData # tnData # rest)
+      In the first argument of ‘pelimList’, namely
+        ‘(\ pair rest
+            -> pif
+                 (pfstBuiltin # pair == csData)
+                 (pfindTNEntry # tnData # (pasMap # (psndBuiltin # pair)))
+                 (self # csData # tnData # rest))’
+    • Relevant bindings include
+        rest :: Term s' (PBuiltinList (PBuiltinPair PData PData))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-06-Voting-EqVsHashEq/Plutarch.hs:37:13)
+        pair :: Term s' (PBuiltinPair PData PData)
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-06-Voting-EqVsHashEq/Plutarch.hs:37:8)
+        entries :: Term s' (PBuiltinList (PBuiltinPair PData PData))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-06-Voting-EqVsHashEq/Plutarch.hs:35:67)
+        tnData :: Term s' PData
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-06-Voting-EqVsHashEq/Plutarch.hs:35:60)
+        csData :: Term s' PData
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-06-Voting-EqVsHashEq/Plutarch.hs:35:53)
+        self :: Term
+                  s'
+                  (PData
+                   :--> (PData
+                         :--> (PBuiltinList (PBuiltinPair PData PData) :--> PBool)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-06-Voting-EqVsHashEq/Plutarch.hs:35:48)
+   |
+39 |           (pfstBuiltin # pair == csData)
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

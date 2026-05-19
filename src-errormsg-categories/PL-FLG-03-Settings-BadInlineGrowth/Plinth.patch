@@ -1,0 +1,25 @@
+# source: src/Settings/Contracts/SettingsPlinth.hs
+#
+# Category: Plinth - GHC/plugin flag misconfiguration
+# Bug: a non-numeric value is passed to the integer-valued option
+# `inline-callsite-growth`. The option is correctly spelled (it lives
+# in the registered set), but `readOption` cannot parse "huge" into
+# an Int, so the plugin aborts at init with a `CannotParseValue`
+# diagnostic naming both the offending key and value.
+#
+# Apply with:
+#   cp <repo>/src/Settings/Contracts/SettingsPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -7,7 +7,7 @@
+ {-# LANGUAGE ViewPatterns #-}
+ {-# LANGUAGE NoImplicitPrelude #-}
+ {-# OPTIONS_GHC -Wno-missing-import-lists -Wno-missing-export-lists -Wno-missing-deriving-strategies #-}
+ {-# OPTIONS_GHC -fplugin Plinth.Plugin #-}
+-{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:inline-callsite-growth=20 #-}
++{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:inline-callsite-growth=huge #-}
+ {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:inline-unconditional-growth=20 #-}
+ {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:no-preserve-logging #-}
+ {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:preserve-source-locations #-}

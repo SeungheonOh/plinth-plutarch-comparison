@@ -1,0 +1,44 @@
+# source: src/Vesting/Contracts/VestingPlinth.hs
+#
+# Category: Plinth - Unsupported Haskell feature
+# Bug: append `statusLabel :: Text` and a `plinthc`-compiled
+# `textEntry` that returns it. Plinth's `unsupportedTypes` table
+# catches `Data.Text.Text` and emits a custom message pointing the
+# user at `BuiltinString` as the on-chain string type.
+#
+# Apply with:
+#   cp <repo>/src/Vesting/Contracts/VestingPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -11,8 +11,10 @@
+ 
+ module Vesting.Contracts.VestingPlinth (
+   plinthVestingScript,
++  plinthTextScript,
+ ) where
+ 
++import Data.Text (Text)
+ import Plinth.Plugin
+ import Plutarch.Script (Script (..))
+ import PlutusLedgerApi.Data.V3
+@@ -247,3 +249,18 @@
+ plinthVestingScript :: Script
+ plinthVestingScript =
+   compiledCodeToScript $ plinthc mkVestingValidator
++
++-- BUG: `statusLabel :: Text` uses `Data.Text.Text` instead of Plinth's
++-- on-chain `BuiltinString`. The plugin's `unsupportedTypes` table
++-- catches `Text` and emits a custom message pointing the user at
++-- `BuiltinString` as the on-chain string type.
++{-# INLINEABLE statusLabel #-}
++statusLabel :: Text
++statusLabel = "ok"
++
++{-# INLINEABLE textEntry #-}
++textEntry :: BuiltinData -> Text
++textEntry _ = statusLabel
++
++plinthTextScript :: Script
++plinthTextScript = compiledCodeToScript $ plinthc textEntry

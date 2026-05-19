@@ -1,0 +1,48 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-04-Vesting-MissingPlam/Plutarch.hs:(145,34)-(153,5): error: [GHC-83865]
+    • Couldn't match expected type: Term
+                                      s'
+                                      (PInteger
+                                       :--> (PInteger
+                                             :--> (PInteger :--> (PInteger :--> PInteger))))
+                  with actual type: Term s0 PInteger
+                                    -> Term s0 PInteger
+                                    -> Term s0 PInteger
+                                    -> Term s0 PInteger
+                                    -> Term s0 PInteger
+    • The lambda expression ‘\ startTimestamp
+                               duration
+                               totalAllocation
+                               timestamp
+                               -> pif
+                                    (timestamp #< startTimestamp) 0
+                                    (pif
+                                       (timestamp #> startTimestamp + duration) totalAllocation
+                                       (pdiv # (totalAllocation * (timestamp - startTimestamp))
+                                          # duration))’
+      has four value arguments,
+        but its type ‘Term
+                        s'
+                        (PInteger
+                         :--> (PInteger :--> (PInteger :--> (PInteger :--> PInteger))))’
+        has none
+      In the second argument of ‘($)’, namely
+        ‘\ startTimestamp duration totalAllocation timestamp
+           -> pif
+                (timestamp #< startTimestamp) 0
+                (pif
+                   (timestamp #> startTimestamp + duration) totalAllocation
+                   (pdiv # (totalAllocation * (timestamp - startTimestamp))
+                      # duration))’
+      In the expression:
+        phoistAcyclic
+          $ \ startTimestamp duration totalAllocation timestamp
+              -> pif
+                   (timestamp #< startTimestamp) 0
+                   (pif
+                      (timestamp #> startTimestamp + duration) totalAllocation
+                      (pdiv # (totalAllocation * (timestamp - startTimestamp))
+                         # duration))
+    |
+145 | plinearVesting = phoistAcyclic $ \startTimestamp duration totalAllocation timestamp ->
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...

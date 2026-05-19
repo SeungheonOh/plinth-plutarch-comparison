@@ -1,0 +1,14 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DAT-03-Constitution-MissingPData/Plutarch.hs:250:41-75: error: [GHC-83865]
+    • Couldn't match type ‘PGovernanceAction’ with ‘PAsData a0’
+      Expected: Term s' (PAsData a0)
+        Actual: Term s' PGovernanceAction
+    • In the first argument of ‘pforgetData’, namely
+        ‘pproposalProcedure'governanceAction’
+      In the second argument of ‘(#)’, namely
+        ‘pforgetData pproposalProcedure'governanceAction’
+      In the first argument of ‘plet’, namely
+        ‘(pasConstr # pforgetData pproposalProcedure'governanceAction)’
+    |
+250 |           plet (pasConstr # pforgetData pproposalProcedure'governanceAction) $ \govConstr ->
+    |                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

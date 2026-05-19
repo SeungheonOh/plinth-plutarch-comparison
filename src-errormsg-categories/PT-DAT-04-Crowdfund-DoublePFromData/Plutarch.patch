@@ -1,0 +1,27 @@
+# source: src/Crowdfund/Contracts/Crowdfund.hs
+#
+# Category: Plutarch - PAsData wrap/unwrap confusion
+# Bug: apply `pfromData` twice to `pdonateDonor` when passing it down
+# into `pcheckDonate`. The field `pdonateDonor` already has type
+# `Term s (PAsData PPubKeyHash)`; one `pfromData` lifts it to
+# `Term s PPubKeyHash`. A second `pfromData` then expects its argument
+# to be `Term s (PAsData a0)` for some unknown `a0`, but it is now an
+# unwrapped `PPubKeyHash`. GHC reports
+# "Couldn't match type 'PPubKeyHash' with 'PAsData a0'" at the inner
+# `pfromData` call site. The fix is to remove the extra `pfromData`.
+#
+# Apply with:
+#   cp <repo>/src/Crowdfund/Contracts/Crowdfund.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -347,7 +347,7 @@
+                           # contractOutputs
+                           # contractAmount
+                           # pfromData pdonateAmount
+-                          # pfromData pdonateDonor
++                          # pfromData (pfromData pdonateDonor)
+                       PWithdraw ->
+                         pcheckWithdraw # datum # txInfo # contractAmount
+                       PReclaim ->

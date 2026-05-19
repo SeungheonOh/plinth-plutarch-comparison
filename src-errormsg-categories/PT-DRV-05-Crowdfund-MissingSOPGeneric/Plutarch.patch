@@ -1,0 +1,26 @@
+# source: src/Crowdfund/Types/CrowdfundState.hs
+#
+# Category: Plutarch - PlutusType derivation error
+# Bug: drop `SOP.Generic` from the `deriving anyclass` list of
+# `PCrowdfundDatum`. The `DeriveAsDataStruct` strategy reads the
+# generics-sop sum-of-products code via `Generics.SOP.Generic`. The
+# stock `GHC.Generics.Generic` instance is still present, but `SOP.Generic`
+# is what `PlutusType` (and `PIsData`, `PEq`, `PShow`) actually traverse,
+# so its absence makes every superclass-required instance unsolvable
+# and GHC reports `No instance for ‘Generics.SOP.Generic.Generic ...’`.
+#
+# Apply with:
+#   cp <repo>/src/Crowdfund/Types/CrowdfundState.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -96,7 +96,7 @@
+   , pcfWallets :: Term s (PAsData (PMap 'Unsorted PPubKeyHash PInteger))
+   }
+   deriving stock (Generic)
+-  deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
++  deriving anyclass (PIsData, PEq, PShow)
+   deriving (PlutusType) via (DeriveAsDataStruct PCrowdfundDatum)
+
+ deriving via

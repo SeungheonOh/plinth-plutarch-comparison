@@ -1,0 +1,401 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1067:5-14: error: [GHC-83865]
+    • Couldn't match type: Term s (PBuiltinList (PAsData PTxInInfo))
+                     with: PScriptContext s
+      Expected: (PTxInfo s -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> PScriptContext s
+        Actual: (PTxInfo s -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> Term s (PBuiltinList (PAsData PTxInInfo))
+    • In a stmt of a 'do' block:
+        PScriptContext {pscriptContext'txInfo, pscriptContext'redeemer,
+                        pscriptContext'scriptInfo} <- pmatch ctx
+      In the expression:
+        do PScriptContext {pscriptContext'txInfo, pscriptContext'redeemer,
+                           pscriptContext'scriptInfo} <- pmatch ctx
+           PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                    ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                    ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+           let red
+                 = pfromData
+                     $ punsafeCoerce
+                         @(PAsData PProgrammableLogicGlobalRedeemer)
+                         (pto pscriptContext'redeemer)
+           referenceInputs <- plet $ pfromData ptxInfo'referenceInputs
+           ....
+      In the second argument of ‘($)’, namely
+        ‘\ protocolParamsCS ctx
+           -> do PScriptContext {pscriptContext'txInfo,
+                                 pscriptContext'redeemer, pscriptContext'scriptInfo} <- pmatch ctx
+                 PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                          ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                          ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+                 ....’
+    • Relevant bindings include
+        ctx :: Term s PTxInfo
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1065:54)
+        protocolParamsCS :: Term s (PAsData PCurrencySymbol)
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1065:37)
+        mkProgrammableLogicGlobal :: Term
+                                       s (PAsData PCurrencySymbol :--> (PScriptContext :--> PUnit))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1065:1)
+     |
+1067 |     pmatch ctx
+     |     ^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1077:5-32: error: [GHC-83865]
+    • Couldn't match type: Term s (PBuiltinList (PAsData PTxInInfo))
+                     with: PTxInfo s
+      Expected: (PTxInfo s -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> PTxInfo s
+        Actual: (PTxInfo s -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> Term s (PBuiltinList (PAsData PTxInInfo))
+    • In a stmt of a 'do' block:
+        PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                 ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                 ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+      In the expression:
+        do PScriptContext {pscriptContext'txInfo, pscriptContext'redeemer,
+                           pscriptContext'scriptInfo} <- pmatch ctx
+           PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                    ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                    ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+           let red
+                 = pfromData
+                     $ punsafeCoerce
+                         @(PAsData PProgrammableLogicGlobalRedeemer)
+                         (pto pscriptContext'redeemer)
+           referenceInputs <- plet $ pfromData ptxInfo'referenceInputs
+           ....
+      In the second argument of ‘($)’, namely
+        ‘\ protocolParamsCS ctx
+           -> do PScriptContext {pscriptContext'txInfo,
+                                 pscriptContext'redeemer, pscriptContext'scriptInfo} <- pmatch ctx
+                 PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                          ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                          ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+                 ....’
+    • Relevant bindings include
+        pscriptContext'scriptInfo :: Term s PScriptInfo
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1066:66)
+        pscriptContext'redeemer :: Term s PRedeemer
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1066:41)
+        pscriptContext'txInfo :: Term s PTxInfo
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1066:18)
+        ctx :: Term s PTxInfo
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1065:54)
+        protocolParamsCS :: Term s (PAsData PCurrencySymbol)
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1065:37)
+        mkProgrammableLogicGlobal :: Term
+                                       s (PAsData PCurrencySymbol :--> (PScriptContext :--> PUnit))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1065:1)
+     |
+1077 |     pmatch pscriptContext'txInfo
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1080:22-61: error: [GHC-83865]
+    • Couldn't match type: Term s (PBuiltinList (PAsData PTxInInfo))
+                     with: PTxInfo s
+      Expected: (PTxInfo s -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> Term s (PBuiltinList (PAsData PTxInInfo))
+        Actual: (Term s (PBuiltinList (PAsData PTxInInfo))
+                 -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> Term s (PBuiltinList (PAsData PTxInInfo))
+    • In a stmt of a 'do' block:
+        referenceInputs <- plet $ pfromData ptxInfo'referenceInputs
+      In the expression:
+        do PScriptContext {pscriptContext'txInfo, pscriptContext'redeemer,
+                           pscriptContext'scriptInfo} <- pmatch ctx
+           PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                    ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                    ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+           let red
+                 = pfromData
+                     $ punsafeCoerce
+                         @(PAsData PProgrammableLogicGlobalRedeemer)
+                         (pto pscriptContext'redeemer)
+           referenceInputs <- plet $ pfromData ptxInfo'referenceInputs
+           ....
+      In the second argument of ‘($)’, namely
+        ‘\ protocolParamsCS ctx
+           -> do PScriptContext {pscriptContext'txInfo,
+                                 pscriptContext'redeemer, pscriptContext'scriptInfo} <- pmatch ctx
+                 PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                          ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                          ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+                 ....’
+    • Relevant bindings include
+        red :: Term s PProgrammableLogicGlobalRedeemer
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1078:7)
+        ptxInfo'redeemers :: Term
+                               s (PAsData (PMap Unsorted PScriptPurpose PRedeemer))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1075:7)
+        ptxInfo'mint :: Term s (PAsData (PValue Sorted NonZero))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1074:7)
+        ptxInfo'wdrl :: Term
+                          s (PAsData (PMap Unsorted PCredential PLovelace))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1073:7)
+        ptxInfo'signatories :: Term
+                                 s (PAsData (PBuiltinList (PAsData PPubKeyHash)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1072:7)
+        ptxInfo'outputs :: Term s (PAsData (PBuiltinList (PAsData PTxOut)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1071:7)
+        (Some bindings suppressed; use -fmax-relevant-binds=N or -fno-max-relevant-binds)
+     |
+1080 |   referenceInputs <- plet $ pfromData ptxInfo'referenceInputs
+     |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:(1083,5)-(1084,73): error: [GHC-83865]
+    • Couldn't match type: Term s (PBuiltinList (PAsData PTxInInfo))
+                     with: PProgrammableLogicGlobalParams s
+      Expected: (PTxInfo s -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> PProgrammableLogicGlobalParams s
+        Actual: (PProgrammableLogicGlobalParams s
+                 -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> Term s (PBuiltinList (PAsData PTxInInfo))
+    • In a stmt of a 'do' block:
+        PProgrammableLogicGlobalParams {pdirectoryNodeCS,
+                                        pprogLogicCred} <- pmatch
+                                                             $ findReferenceInputByCS
+                                                                 (pfromData protocolParamsCS)
+                                                                 referenceInputs
+      In the expression:
+        do PScriptContext {pscriptContext'txInfo, pscriptContext'redeemer,
+                           pscriptContext'scriptInfo} <- pmatch ctx
+           PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                    ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                    ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+           let red
+                 = pfromData
+                     $ punsafeCoerce
+                         @(PAsData PProgrammableLogicGlobalRedeemer)
+                         (pto pscriptContext'redeemer)
+           referenceInputs <- plet $ pfromData ptxInfo'referenceInputs
+           ....
+      In the second argument of ‘($)’, namely
+        ‘\ protocolParamsCS ctx
+           -> do PScriptContext {pscriptContext'txInfo,
+                                 pscriptContext'redeemer, pscriptContext'scriptInfo} <- pmatch ctx
+                 PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                          ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                          ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+                 ....’
+    • Relevant bindings include
+        referenceInputs :: Term s (PBuiltinList (PAsData PTxInInfo))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1080:3)
+        red :: Term s PProgrammableLogicGlobalRedeemer
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1078:7)
+        ptxInfo'redeemers :: Term
+                               s (PAsData (PMap Unsorted PScriptPurpose PRedeemer))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1075:7)
+        ptxInfo'mint :: Term s (PAsData (PValue Sorted NonZero))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1074:7)
+        ptxInfo'wdrl :: Term
+                          s (PAsData (PMap Unsorted PCredential PLovelace))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1073:7)
+        ptxInfo'signatories :: Term
+                                 s (PAsData (PBuiltinList (PAsData PPubKeyHash)))
+          (bound at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1072:7)
+        (Some bindings suppressed; use -fmax-relevant-binds=N or -fno-max-relevant-binds)
+     |
+1083 |     pmatch $
+     |     ^^^^^^^^...
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1085:20-50: error: [GHC-83865]
+    • Couldn't match type ‘PCredential’
+                     with ‘PBuiltinList (PAsData PTxInInfo)’
+      Expected: (PTxInfo s -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> Term s PCredential
+        Actual: (Term s PCredential -> Term s PCredential)
+                -> Term s PCredential
+    • In a stmt of a 'do' block:
+        progLogicCred <- plet $ pfromData pprogLogicCred
+      In the expression:
+        do PScriptContext {pscriptContext'txInfo, pscriptContext'redeemer,
+                           pscriptContext'scriptInfo} <- pmatch ctx
+           PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                    ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                    ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+           let red
+                 = pfromData
+                     $ punsafeCoerce
+                         @(PAsData PProgrammableLogicGlobalRedeemer)
+                         (pto pscriptContext'redeemer)
+           referenceInputs <- plet $ pfromData ptxInfo'referenceInputs
+           ....
+      In the second argument of ‘($)’, namely
+        ‘\ protocolParamsCS ctx
+           -> do PScriptContext {pscriptContext'txInfo,
+                                 pscriptContext'redeemer, pscriptContext'scriptInfo} <- pmatch ctx
+                 PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                          ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                          ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+                 ....’
+     |
+1085 |   progLogicCred <- plet $ pfromData pprogLogicCred
+     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1086:24-58: error: [GHC-83865]
+    • Couldn't match type: PBuiltinPair
+                             (PAsData PCredential) (PAsData PLovelace)
+                     with: PAsData PTxInInfo
+      Expected: (PTxInfo s -> Term s (PBuiltinList (PAsData PTxInInfo)))
+                -> Term
+                     s
+                     (PBuiltinList
+                        (PBuiltinPair (PAsData PCredential) (PAsData PLovelace)))
+        Actual: (Term
+                   s
+                   (PBuiltinList
+                      (PBuiltinPair (PAsData PCredential) (PAsData PLovelace)))
+                 -> Term
+                      s
+                      (PBuiltinList
+                         (PBuiltinPair (PAsData PCredential) (PAsData PLovelace))))
+                -> Term
+                     s
+                     (PBuiltinList
+                        (PBuiltinPair (PAsData PCredential) (PAsData PLovelace)))
+    • In a stmt of a 'do' block:
+        withdrawalEntries <- plet $ pto (pfromData ptxInfo'wdrl)
+      In the expression:
+        do PScriptContext {pscriptContext'txInfo, pscriptContext'redeemer,
+                           pscriptContext'scriptInfo} <- pmatch ctx
+           PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                    ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                    ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+           let red
+                 = pfromData
+                     $ punsafeCoerce
+                         @(PAsData PProgrammableLogicGlobalRedeemer)
+                         (pto pscriptContext'redeemer)
+           referenceInputs <- plet $ pfromData ptxInfo'referenceInputs
+           ....
+      In the second argument of ‘($)’, namely
+        ‘\ protocolParamsCS ctx
+           -> do PScriptContext {pscriptContext'txInfo,
+                                 pscriptContext'redeemer, pscriptContext'scriptInfo} <- pmatch ctx
+                 PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                          ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                          ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+                 ....’
+     |
+1086 |   withdrawalEntries <- plet $ pto (pfromData ptxInfo'wdrl)
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:(1088,3)-(1161,35): error: [GHC-83865]
+    • Expected kind ‘S -> *’, but ‘b0’ has kind ‘*’
+    • In a stmt of a 'do' block:
+        pmatch red
+          $ \case
+              PTransferAct transferProofs mintProofs
+                -> P.do cachedTransferScript0 <- plet
+                                                   $ pfstBuiltin
+                                                       # (phead @PBuiltinList # withdrawalEntries)
+                        totalProgTokenValue <- plet
+                                                 $ valueFromCred
+                                                     progLogicCred (pfromData ptxInfo'signatories)
+                                                     withdrawalEntries (pfromData ptxInfo'inputs)
+                        ....
+              PSeizeAct {pdirectoryNodeIdx, pinputIdxs, poutputsStartIdx,
+                         plengthInputIdxs}
+                -> P.do inputIdxsLen <- plet $ pfromData plengthInputIdxs
+                        let ...
+                        ....
+      In the expression:
+        do PScriptContext {pscriptContext'txInfo, pscriptContext'redeemer,
+                           pscriptContext'scriptInfo} <- pmatch ctx
+           PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                    ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                    ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+           let red
+                 = pfromData
+                     $ punsafeCoerce
+                         @(PAsData PProgrammableLogicGlobalRedeemer)
+                         (pto pscriptContext'redeemer)
+           referenceInputs <- plet $ pfromData ptxInfo'referenceInputs
+           ....
+      In the second argument of ‘($)’, namely
+        ‘\ protocolParamsCS ctx
+           -> do PScriptContext {pscriptContext'txInfo,
+                                 pscriptContext'redeemer, pscriptContext'scriptInfo} <- pmatch ctx
+                 PTxInfo {ptxInfo'inputs, ptxInfo'referenceInputs, ptxInfo'outputs,
+                          ptxInfo'signatories, ptxInfo'wdrl, ptxInfo'mint,
+                          ptxInfo'redeemers} <- pmatch pscriptContext'txInfo
+                 ....’
+     |
+1088 |   pmatch red $ \case
+     |   ^^^^^^^^^^^^^^^^^^...
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1090:7-93: error: [GHC-18872]
+    • Couldn't match kind ‘*’ with ‘S -> *’
+      When matching types
+        PUnit :: S -> *
+        b0 :: *
+      Expected: Term s b0
+        Actual: Term s PUnit
+    • In a stmt of a qualified 'do' block:
+        cachedTransferScript0 <- plet
+                                   $ pfstBuiltin # (phead @PBuiltinList # withdrawalEntries)
+      In the expression:
+        P.do cachedTransferScript0 <- plet
+                                        $ pfstBuiltin # (phead @PBuiltinList # withdrawalEntries)
+             totalProgTokenValue <- plet
+                                      $ valueFromCred
+                                          progLogicCred (pfromData ptxInfo'signatories)
+                                          withdrawalEntries (pfromData ptxInfo'inputs)
+             totalProgTokenValue_ <- plet
+                                       $ checkTransferLogicAndGetProgrammableValue
+                                           (pfromData pdirectoryNodeCS) referenceInputs
+                                           (pfromData transferProofs) withdrawalEntries
+                                           cachedTransferScript0 totalProgTokenValue
+             mintValueNoGuarantees <- plet
+                                        $ punsafeCoerce
+                                            @(PValue 'Sorted 'NoGuarantees) (pfromData ptxInfo'mint)
+             ....
+      In a \case alternative:
+          PTransferAct transferProofs mintProofs
+            -> P.do cachedTransferScript0 <- plet
+                                               $ pfstBuiltin
+                                                   # (phead @PBuiltinList # withdrawalEntries)
+                    totalProgTokenValue <- plet
+                                             $ valueFromCred
+                                                 progLogicCred (pfromData ptxInfo'signatories)
+                                                 withdrawalEntries (pfromData ptxInfo'inputs)
+                    totalProgTokenValue_ <- plet
+                                              $ checkTransferLogicAndGetProgrammableValue
+                                                  (pfromData pdirectoryNodeCS) referenceInputs
+                                                  (pfromData transferProofs) withdrawalEntries
+                                                  cachedTransferScript0 totalProgTokenValue
+                    ....
+     |
+1090 |       cachedTransferScript0 <- plet $ pfstBuiltin # (phead @PBuiltinList # withdrawalEntries)
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-SYN-05-SmartTokens-PlainDoVsPDot/Plutarch.hs:1132:7-55: error: [GHC-18872]
+    • Couldn't match kind ‘*’ with ‘S -> *’
+      When matching types
+        PUnit :: S -> *
+        b0 :: *
+      Expected: Term s b0
+        Actual: Term s PUnit
+    • In a stmt of a qualified 'do' block:
+        inputIdxsLen <- plet $ pfromData plengthInputIdxs
+      In the expression:
+        P.do inputIdxsLen <- plet $ pfromData plengthInputIdxs
+             let inputIdxsData = ...
+             let remainingOutputs
+                   = dropFast # pfromData poutputsStartIdx # pfromData ptxInfo'outputs
+             let directoryNodeUTxO
+                   = phead
+                       # (dropFast # pfromData pdirectoryNodeIdx # referenceInputs)
+             ....
+      In a \case alternative:
+          PSeizeAct {pdirectoryNodeIdx, pinputIdxs, poutputsStartIdx,
+                     plengthInputIdxs}
+            -> P.do inputIdxsLen <- plet $ pfromData plengthInputIdxs
+                    let inputIdxsData = ...
+                    let remainingOutputs = ...
+                    ....
+     |
+1132 |       inputIdxsLen <- plet $ pfromData plengthInputIdxs
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

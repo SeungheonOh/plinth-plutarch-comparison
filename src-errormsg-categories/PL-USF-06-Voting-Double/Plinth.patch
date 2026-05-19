@@ -1,0 +1,47 @@
+# source: src/Voting/Contracts/VotingPlinth.hs
+#
+# Category: Plinth - Unsupported Haskell feature
+# Bug: append `quorumThreshold :: Haskell.Double` and a
+# `plinthc`-compiled `doubleEntry` that returns it. Plinth's
+# `unsupportedTypes` table catches `Double` and emits a custom
+# message pointing the user at `PlutusTx.Ratio.Rational` as the
+# on-chain rational type.
+#
+# Apply with:
+#   cp <repo>/src/Voting/Contracts/VotingPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -10,9 +10,11 @@
+ 
+ module Voting.Contracts.VotingPlinth (
+   plinthVotingScript,
++  plinthDoubleScript,
+ ) where
+ 
+ import Plinth.Plugin
++import Prelude qualified as Haskell
+ import Plutarch.Script (Script (..))
+ import PlutusLedgerApi.Data.V3
+ import PlutusTx qualified
+@@ -114,3 +116,19 @@
+ plinthVotingScript :: Script
+ plinthVotingScript =
+   compiledCodeToScript $ plinthc mkVotingValidator
++
++-- BUG: `quorumThreshold :: Haskell.Double` slips a floating-point
++-- type into a `plinthc`-compiled validator. Plinth's
++-- `unsupportedTypes` table catches `Double` and emits a custom
++-- message pointing the user at `PlutusTx.Ratio.Rational` as the
++-- on-chain rational type.
++{-# INLINEABLE quorumThreshold #-}
++quorumThreshold :: Haskell.Double
++quorumThreshold = 0.66
++
++{-# INLINEABLE doubleEntry #-}
++doubleEntry :: BuiltinData -> Haskell.Double
++doubleEntry _ = quorumThreshold
++
++plinthDoubleScript :: Script
++plinthDoubleScript = compiledCodeToScript $ plinthc doubleEntry

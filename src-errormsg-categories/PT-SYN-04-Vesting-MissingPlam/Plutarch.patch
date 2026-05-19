@@ -1,0 +1,29 @@
+# source: src/Vesting/Contracts/Vesting.hs
+#
+# Category: Plutarch - let/plet, ->/:--> mix-up
+# Bug: drop `plam` from `plinearVesting`. `plam` is the Plutarch value-
+# level binder that wraps a Haskell function `Term s a -> Term s b` into
+# a Plutarch function `Term s (a :--> b)`. Without it, the surrounding
+# `phoistAcyclic` sees a raw Haskell n-ary lambda whose type is
+# `Term s PInteger -> Term s PInteger -> Term s PInteger -> Term s
+# PInteger -> Term s PInteger` and tries to unify that against the
+# declared signature `Term s (PInteger :--> PInteger :--> PInteger
+# :--> PInteger :--> PInteger)`. GHC fails with a "Couldn't match"
+# diagnostic between the Haskell-arrow and Plutarch-arrow shapes,
+# pinpointing the missing `plam`.
+#
+# Apply with:
+#   cp <repo>/src/Vesting/Contracts/Vesting.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -142,7 +142,7 @@
+
+ plinearVesting
+   :: Term s (PInteger :--> PInteger :--> PInteger :--> PInteger :--> PInteger)
+-plinearVesting = phoistAcyclic $ plam $ \startTimestamp duration totalAllocation timestamp ->
++plinearVesting = phoistAcyclic $ \startTimestamp duration totalAllocation timestamp ->
+   pif
+     (timestamp #< startTimestamp)
+     0

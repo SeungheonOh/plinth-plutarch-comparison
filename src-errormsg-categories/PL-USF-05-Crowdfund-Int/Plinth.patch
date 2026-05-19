@@ -1,0 +1,51 @@
+# source: src/Crowdfund/Contracts/CrowdfundPlinth.hs
+#
+# Category: Plinth - Unsupported Haskell feature
+# Bug: append `walletCapInt :: Haskell.Int` plus an `intEntry`
+# validator that returns it. Plinth's `compileTyCon` special-cases
+# `Int` and emits the tight custom message "Int: use Integer instead".
+# The plugin walks the type signature of `intEntry` (BuiltinData ->
+# Haskell.Int) and aborts as soon as it hits the `Int` tycon.
+#
+# Apply with:
+#   cp <repo>/src/Crowdfund/Contracts/CrowdfundPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -10,6 +10,7 @@
+ 
+ module Crowdfund.Contracts.CrowdfundPlinth (
+   plinthCrowdfundScript,
++  plinthIntScript,
+ ) where
+ 
+ import Plutarch.Script (Script (..))
+@@ -25,6 +26,7 @@
+ import PlutusTx.Data.List qualified as DList
+ import PlutusTx.Prelude
+ import UntypedPlutusCore qualified as UPLC
++import Prelude qualified as Haskell
+ 
+ import Crowdfund.Types.CrowdfundState
+ 
+@@ -313,3 +315,19 @@
+ plinthCrowdfundScript :: Script
+ plinthCrowdfundScript =
+   compiledCodeToScript $ plinthc mkCrowdfundValidator
++
++-- BUG: `walletCapInt` returns base's `Haskell.Int` instead of on-chain
++-- `Integer`. Plinth's `compileTyCon` special-cases `Int` and emits the
++-- tight custom message "Int: use Integer instead". The plugin tries to
++-- compile the type signature of `walletCapInt` before walking its body
++-- and aborts as soon as it hits the `Int` tycon.
++{-# INLINEABLE walletCapInt #-}
++walletCapInt :: Haskell.Int
++walletCapInt = 100
++
++{-# INLINEABLE intEntry #-}
++intEntry :: BuiltinData -> Haskell.Int
++intEntry _ = walletCapInt
++
++plinthIntScript :: Script
++plinthIntScript = compiledCodeToScript $ plinthc intEntry

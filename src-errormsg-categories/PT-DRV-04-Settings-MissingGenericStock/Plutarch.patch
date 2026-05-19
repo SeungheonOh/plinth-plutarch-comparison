@@ -1,0 +1,25 @@
+# source: src/Settings/Types/SettingsState.hs
+#
+# Category: Plutarch - PlutusType derivation error
+# Bug: drop `deriving stock (Generic)` from `PSettingsDatum`. The
+# `DeriveAsDataStruct` strategy walks the GHC `Generic` representation
+# of the type to lay out its fields. Without the stock `Generic`
+# derivation, the `PlutusType` instance head cannot be elaborated and
+# GHC reports a missing `Generic PSettingsDatum` instance. The two
+# `anyclass` instances that also need `Generic` (`SOP.Generic`,
+# `PIsData`) cascade with the same complaint.
+#
+# Apply with:
+#   cp <repo>/src/Settings/Types/SettingsState.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -192,7 +192,6 @@
+   , psdPoolCreationFee :: Term s (PAsData PInteger)
+   , psdExtensions :: Term s (PAsData PData)
+   }
+-  deriving stock (Generic)
+   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+   deriving (PlutusType) via (DeriveAsDataStruct PSettingsDatum)
+

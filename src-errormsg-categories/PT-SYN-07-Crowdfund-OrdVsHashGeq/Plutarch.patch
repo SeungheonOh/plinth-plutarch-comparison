@@ -1,0 +1,29 @@
+# source: src/Crowdfund/Contracts/Crowdfund.hs
+#
+# Category: Plutarch - let/plet, ->/:--> mix-up
+# Bug: in `pcheckWithdraw`, write `>=` (Haskell's `Ord`) where `#>=`
+# (Plutarch's `POrd`) is needed. `>=` returns Haskell `Bool`, but the
+# enclosing `#&&` expects `Term s PBool`. GHC reports a "Couldn't match
+# expected type `Term s PBool` with actual type `Bool`" plus a follow-on
+# instance-resolution failure since Plutarch `PInteger` terms have no
+# Haskell `Ord` instance. The fix is to swap `>=` for `#>=`.
+#
+# This is the Plutarch analogue of the Plinth case
+# `PL-USF-08-Certifying-PreludeGt` — reaching for stdlib ordering
+# operators instead of the prelude reserved for the target language.
+#
+# Apply with:
+#   cp <repo>/src/Crowdfund/Contracts/Crowdfund.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -257,7 +257,7 @@
+           #&& pnot
+           # (pmustStartBeforeTimeout # validRange # deadline)
+           #&& contractAmount
+-          #>= goal
++          >= goal
+
+ -- ============================================================================
+ -- 5. Reclaim

@@ -1,0 +1,42 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-06-Vesting-NonTermField/Plutarch.hs:58:44-46: error: [GHC-64725]
+    • Non-term in Plutarch data type not allowed. Got: `Integer`
+    • When deriving the instance for (PEq PVestingDatum)
+   |
+58 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+   |                                            ^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-06-Vesting-NonTermField/Plutarch.hs:58:49-53: error: [GHC-64725]
+    • Non-term in Plutarch data type not allowed. Got: `Integer`
+    • When deriving the instance for (PShow PVestingDatum)
+   |
+58 |   deriving anyclass (SOP.Generic, PIsData, PEq, PShow)
+   |                                                 ^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-06-Vesting-NonTermField/Plutarch.hs:59:13-22: error: [GHC-39999]
+    • No instance for ‘SOP.All
+                         (Plutarch.Internal.IsData.PInnermostIsData
+                            (Just
+                               "Data representation can only hold types whose inner most representation is PData"))
+                         (Plutarch.Repr.Internal.UnTermRec '[Integer])’
+        arising from the 'deriving' clause of a data type declaration
+      Possible fix:
+        use a standalone 'deriving instance' declaration,
+          so you can specify the instance context yourself
+    • When deriving the instance for (PlutusType PVestingDatum)
+   |
+59 |   deriving (PlutusType) via (DeriveAsDataStruct PVestingDatum)
+   |             ^^^^^^^^^^
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DRV-06-Vesting-NonTermField/Plutarch.hs:59:13-22: error: [GHC-18872]
+    • Couldn't match type: Plutarch.Repr.Internal.UnTermRec '[Integer]
+                     with: Data.SOP.Constraint.Head
+                             (Plutarch.Repr.Internal.UnTermRec '[Integer])
+                             : Data.SOP.Constraint.Tail
+                                 (Plutarch.Repr.Internal.UnTermRec '[Integer])
+        arising from the head of a quantified constraint
+        arising from the 'deriving' clause of a data type declaration
+    • When deriving the instance for (PlutusType PVestingDatum)
+   |
+59 |   deriving (PlutusType) via (DeriveAsDataStruct PVestingDatum)
+   |             ^^^^^^^^^^

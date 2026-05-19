@@ -1,0 +1,27 @@
+# source: src/SmartTokens/Contracts/ProgrammableLogicBase.hs
+#
+# Category: Plutarch - let/plet, ->/:--> mix-up
+# Bug: switch the outer `P.do` in `mkProgrammableLogicGlobal` to a plain
+# `do`. `Plutarch.Monadic.do` (imported `qualified as P`) rebinds `>>=`
+# under `QualifiedDo` so that `<- pmatch x` desugars to
+# `pmatch x $ \pat -> ...` instead of `pmatch x >>= \pat -> ...`. With
+# plain Haskell `do`, GHC reaches for the regular `Monad` `>>=`, which
+# does not exist for `Term s X`, and the type checker reports a failure
+# to match `Term s X` with any `m a` shape. The fix is to add the `P.`
+# qualifier back.
+#
+# Apply with:
+#   cp <repo>/src/SmartTokens/Contracts/ProgrammableLogicBase.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -1062,7 +1062,7 @@
+ -- ============================================================================
+
+ mkProgrammableLogicGlobal :: Term s (PAsData PCurrencySymbol :--> PScriptContext :--> PUnit)
+-mkProgrammableLogicGlobal = plam $ \protocolParamsCS ctx -> P.do
++mkProgrammableLogicGlobal = plam $ \protocolParamsCS ctx -> do
+   PScriptContext{pscriptContext'txInfo, pscriptContext'redeemer, pscriptContext'scriptInfo} <-
+     pmatch ctx
+   PTxInfo

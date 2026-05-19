@@ -1,0 +1,44 @@
+# source: src/Settings/Contracts/SettingsPlinth.hs
+#
+# Category: Plinth - Unsupported Haskell feature
+# Bug: append `firstInRange` which uses Haskell range syntax
+# `[1 .. n]` and a `plinthc`-compiled `rangeEntry` that calls it.
+# GHC desugars the range to `Prelude.enumFromTo`, which is not on
+# Plinth's allowed list - the plugin emits a custom error pointing
+# the user at `PlutusTx.Enum.enumFromTo` as the on-chain replacement.
+#
+# Apply with:
+#   cp <repo>/src/Settings/Contracts/SettingsPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -14,6 +14,7 @@
+ 
+ module Settings.Contracts.SettingsPlinth (
+   plinthSettingsScript,
++  plinthRangeScript,
+ ) where
+ 
+ import Plinth.Plugin
+@@ -339,3 +340,20 @@
+ plinthSettingsScript :: Script
+ plinthSettingsScript =
+   compiledCodeToScript $ plinthc mkSettingsValidator
++
++-- BUG: `firstInRange` uses Haskell list-range syntax `[1 .. n]`, which
++-- GHC desugars to `Prelude.enumFromTo`. Plinth's plugin has a custom
++-- error for `enumFromTo` / `enumFromThenTo` pointing the user at
++-- `PlutusTx.Enum.enumFromTo` instead.
++{-# INLINEABLE firstInRange #-}
++firstInRange :: Integer -> Integer
++firstInRange n = case [1 .. n] of
++  (x : _) -> x
++  [] -> 0
++
++{-# INLINEABLE rangeEntry #-}
++rangeEntry :: BuiltinData -> ()
++rangeEntry _ = if firstInRange 4 == 1 then () else error ()
++
++plinthRangeScript :: Script
++plinthRangeScript = compiledCodeToScript $ plinthc rangeEntry

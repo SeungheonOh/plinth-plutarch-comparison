@@ -1,0 +1,12 @@
+Plinth Compilation Error:
+Context: Compiling code at /Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PL-USF-08-Certifying-PreludeGt/Plinth.hs:97:18-26:
+         PlutusTx.Plugin.Utils.unsupported
+           @"GHC.Classes.Ord.>, use PlutusTx.Ord.Class.Ord"
+           @"/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PL-USF-08-Certifying-PreludeGt/Plinth.hs\NUL97\NUL18\NUL97\NUL27"
+           @(GHC.Num.Integer.Integer
+             -> GHC.Num.Integer.Integer -> GHC.Types.Bool)
+           GHC.Num.Integer.integerGt
+Error: Unsupported feature: GHC.Classes.Ord.>, use PlutusTx.Ord.Class.Ord
+   |ᴾᴸᴵᴺᵀᴴ
+97 | isPositive n = n Haskell.> 0
+   |                  ^^^^^^^^^

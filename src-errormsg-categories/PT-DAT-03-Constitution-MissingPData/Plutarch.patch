@@ -1,0 +1,26 @@
+# source: src/Constitution/Contracts/ConstitutionSorted.hs
+#
+# Category: Plutarch - PAsData wrap/unwrap confusion
+# Bug: drop the `pdata` wrapper around `pproposalProcedure'governanceAction`
+# before `pforgetData`. The record field has type
+# `Term s PGovernanceAction`, but `pforgetData ::
+# Term s (PAsData a) :--> Term s PData` needs an explicit
+# `PAsData`-wrapped term. Without the `pdata` lift, GHC reports a
+# "Couldn't match type 'PGovernanceAction' with 'PAsData _'" error
+# at the call site.
+#
+# Apply with:
+#   cp <repo>/src/Constitution/Contracts/ConstitutionSorted.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -247,7 +247,7 @@
+     pmatch pscriptContext'scriptInfo $ \case
+       PProposingScript _ pp ->
+         pmatch pp $ \(PProposalProcedure{pproposalProcedure'governanceAction}) ->
+-          plet (pasConstr # pforgetData (pdata pproposalProcedure'governanceAction)) $ \govConstr ->
++          plet (pasConstr # pforgetData pproposalProcedure'governanceAction) $ \govConstr ->
+             let govIdx = pfstBuiltin # govConstr
+                 govFields = psndBuiltin # govConstr
+              in pcond

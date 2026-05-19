@@ -1,0 +1,30 @@
+# source: src/Voting/Contracts/Voting.hs
+#
+# Category: Plutarch - let/plet, ->/:--> mix-up
+# Bug: in `pfindCSEntry`, write `==` (Haskell's `Eq`) where `#==`
+# (Plutarch's `PEq`) is needed. Plutarch terms do not have a Haskell
+# `Eq` instance — equality is a Plutarch term-level operator `#==
+# :: PEq t => Term s t -> Term s t -> Term s PBool`. Reaching for
+# Haskell's `==` makes GHC try to solve `Eq (Term s PData)`, which has
+# no instance, and the diagnostic surfaces as
+# `No instance for ‘Eq (Term s PData)’`.
+#
+# This is the Plutarch analogue of the Plinth case
+# `PL-USF-08-Certifying-PreludeGt`, where the user reached for
+# `Haskell.>` instead of `PlutusTx.Prelude.>`.
+#
+# Apply with:
+#   cp <repo>/src/Voting/Contracts/Voting.hs <case>/Plutarch.hs
+#   (cd <case> && patch -p1 < Plutarch.patch)
+#
+--- a/Plutarch.hs
++++ b/Plutarch.hs
+@@ -36,7 +36,7 @@
+   pelimList
+     ( \pair rest ->
+         pif
+-          (pfstBuiltin # pair #== csData)
++          (pfstBuiltin # pair == csData)
+           (pfindTNEntry # tnData # (pasMap # (psndBuiltin # pair)))
+           (self # csData # tnData # rest)
+     )

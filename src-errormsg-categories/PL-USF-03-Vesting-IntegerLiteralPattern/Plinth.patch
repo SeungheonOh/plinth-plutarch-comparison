@@ -1,0 +1,35 @@
+# source: src/Vesting/Contracts/VestingPlinth.hs
+#
+# Category: Plinth - Unsupported Haskell feature
+# Bug: `linearVesting` is rewritten with an `Integer` literal pattern
+# (`case (timestamp - startTimestamp) of 0 -> 0; elapsed -> ...`).
+# GHC desugars the literal pattern to a call into `GHC.Num.Integer`'s
+# equality, which Plinth has no on-chain unfolding for. The plugin
+# emits its dedicated `Cannot pattern match on a value of type
+# 'Integer'` diagnostic and suggests using PlutusTx.Prelude (==) in a
+# guard instead.
+#
+# Apply with:
+#   cp <repo>/src/Vesting/Contracts/VestingPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -149,10 +149,13 @@
+ 
+ {-# INLINEABLE linearVesting #-}
+ linearVesting :: Integer -> Integer -> Integer -> Integer -> Integer
+-linearVesting startTimestamp duration totalAllocation timestamp
+-  | timestamp < startTimestamp = 0
+-  | timestamp > startTimestamp + duration = totalAllocation
+-  | otherwise = divide (totalAllocation * (timestamp - startTimestamp)) duration
++linearVesting startTimestamp duration totalAllocation timestamp =
++  case timestamp - startTimestamp of
++    0 -> 0
++    elapsed
++      | elapsed < 0 -> 0
++      | elapsed > duration -> totalAllocation
++      | otherwise -> divide (totalAllocation * elapsed) duration
+ 
+ -- ============================================================================
+ -- 4. Main validator logic

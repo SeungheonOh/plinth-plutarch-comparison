@@ -1,0 +1,13 @@
+
+/Users/sho/io/plinth-plutarch-paper-code/src-errormsg-categories/PT-DAT-04-Crowdfund-DoublePFromData/Plutarch.hs:350:50-61: error: [GHC-83865]
+    • Couldn't match type ‘PPubKeyHash’ with ‘PAsData PPubKeyHash’
+      Expected: Term s' (PAsData (PAsData PPubKeyHash))
+        Actual: Term s' (PAsData PPubKeyHash)
+    • In the first argument of ‘pfromData’, namely ‘pdonateDonor’
+      In the first argument of ‘pfromData’, namely
+        ‘(pfromData pdonateDonor)’
+      In the second argument of ‘(#)’, namely
+        ‘pfromData (pfromData pdonateDonor)’
+    |
+350 |                           # pfromData (pfromData pdonateDonor)
+    |                                                  ^^^^^^^^^^^^

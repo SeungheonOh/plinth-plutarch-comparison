@@ -1,0 +1,50 @@
+# source: src/Certifying/Contracts/CertifyingPlinth.hs
+#
+# Category: Plinth - Unsupported Haskell feature
+# Bug: append `isPositive` which accidentally uses `Prelude.>`
+# (base's `GHC.Classes.Ord.>`) instead of the on-chain `>` from
+# `PlutusTx.Prelude`, plus a `plinthc`-compiled `preludeGtEntry`.
+# Plinth's typeCheckResultAction wraps every base typeclass method
+# with an `unsupported` marker, so the plugin reports
+# "GHC.Classes.Ord.>, use PlutusTx.Ord.Class.Ord" pointing at the
+# offending call site.
+#
+# Apply with:
+#   cp <repo>/src/Certifying/Contracts/CertifyingPlinth.hs <case>/Plinth.hs
+#   (cd <case> && patch -p1 < Plinth.patch)
+#
+--- a/Plinth.hs
++++ b/Plinth.hs
+@@ -12,9 +12,11 @@
+ 
+ module Certifying.Contracts.CertifyingPlinth (
+   plinthCertifyingScript,
++  plinthPreludeGtScript,
+ ) where
+ 
+ import Plinth.Plugin
++import Prelude qualified as Haskell
+ import Plutarch.Script (Script (..))
+ import PlutusLedgerApi.Data.V3
+ import PlutusTx qualified
+@@ -83,3 +85,20 @@
+ plinthCertifyingScript :: Script
+ plinthCertifyingScript =
+   compiledCodeToScript $ plinthc mkCertifyingValidator
++
++-- BUG: `isPositive` accidentally reaches for `Prelude.>` (base's
++-- `GHC.Classes.Ord.>`) instead of the on-chain `>` from
++-- `PlutusTx.Prelude`. Plinth's typeCheckResultAction tags every base
++-- typeclass method with an `unsupported` marker, so the plugin
++-- reports `Unsupported feature: GHC.Classes.Ord.>, use PlutusTx.Ord.Class.Ord`
++-- pointing at the offending call site.
++{-# INLINEABLE isPositive #-}
++isPositive :: Integer -> Bool
++isPositive n = n Haskell.> 0
++
++{-# INLINEABLE preludeGtEntry #-}
++preludeGtEntry :: BuiltinData -> ()
++preludeGtEntry _ = if isPositive 1 then () else error ()
++
++plinthPreludeGtScript :: Script
++plinthPreludeGtScript = compiledCodeToScript $ plinthc preludeGtEntry
