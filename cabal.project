@@ -11,7 +11,7 @@ repository cardano-haskell-packages
 
 index-state:
   , hackage.haskell.org 2026-04-24T12:33:57Z
-  , cardano-haskell-packages 2026-05-11T20:15:43Z
+  , cardano-haskell-packages 2026-05-21T12:00:00Z
 
 with-compiler: ghc-9.6.6
 
@@ -32,9 +32,9 @@ test-show-details: direct
 tests: True
 
 constraints:
-    plutus-core == 1.64.0.0
-  , plutus-tx == 1.64.0.0
-  , plutus-ledger-api == 1.64.0.0
+    plutus-core == 1.65.0.0
+  , plutus-tx == 1.65.0.0
+  , plutus-ledger-api == 1.65.0.0
 
 allow-newer:
     *:data-default
@@ -49,15 +49,3 @@ source-repository-package
       plutarch-ledger-api
       plutarch-orphanage
       plutarch-testlib
-
-source-repository-package
-    type: git
-    location: https://github.com/IntersectMBO/plutus
-    tag: 28395b5e397d5baeed518cde526179faa9751718
-    --sha256: sha256-uCfpr8Uumxv/G/UtqWiL1aBpmwO86wt8We6o3w7c2HI=
-    subdir:
-      plutus-core
-      plutus-ledger-api
-      plutus-metatheory
-      plutus-tx
-      plutus-tx-plugin

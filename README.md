@@ -12,7 +12,7 @@ This repository ports 7 Cardano smart contracts to both Plinth and Plutarch from
 | [Certifying](./src/Certifying) | Certifying | [SundaeSwap-finance/treasury-contracts &mdash; treasury.ak](https://github.com/SundaeSwap-finance/treasury-contracts/blob/main/validators/treasury.ak#L83), [vendor.ak](https://github.com/SundaeSwap-finance/treasury-contracts/blob/main/validators/vendor.ak#L57) | Aiken | Vote-delegation certificate validation |
 | [Voting](./src/Voting) | Voting | [IntersectMBO/credential-manager &mdash; HotCommittee.hs](https://github.com/IntersectMBO/credential-manager/blob/main/credential-manager/src/CredentialManager/Scripts/HotCommittee.hs) | Plinth | Hot committee credential script |
 
-All data is collected using Plinth compiler version `1.64.0.0` and Plutarch version `1.12.0`. Both Plinth and Plutarch depend on `plutus-core`, which provides the UPLC virtual machine that executes scripts and measures their execution budget. To make both languages buildable within a single project, we use a fork of Plutarch. The changes in the fork are minimal and self-contained: they only adapt Plutarch to interface changes in the `plutus-core` library.
+All data is collected using Plinth compiler version `1.65.0.0` and Plutarch version `1.12.0`. Both Plinth and Plutarch depend on `plutus-core`, which provides the UPLC virtual machine that executes scripts and measures their execution budget. To make both languages buildable within a single project, we use a fork of Plutarch. The changes in the fork are minimal and self-contained: they only adapt Plutarch to interface changes in the `plutus-core` library.
 
 ## Benchmarks
 
@@ -22,7 +22,7 @@ All numbers below were produced by the executables in this repository:
 - **Script size (bytes)** and **execution cost (CPU steps, memory units)** &mdash; `cabal run bench-scripts`. Sizes are serialized UPLC; execution costs are reported by the `plutus-core` CEK evaluator.
 - **Source program jargon level** &mdash; `cabal run measure-jargon-level`. Counts occurrences in `Contracts/*.hs` of DSL-specific identifiers, types, and operators that originate in each language's libraries (e.g. `plet`, `pmatch`, `#==`, `:-->`, `PScriptContext` for Plutarch; `plinthc`, `unsafeFromBuiltinData`, `BI.*`, `DList.*`, `ScriptContext` for Plinth). The two curated lists are kept structurally parallel so every P-prefixed Plutarch ledger type has its unprefixed Plinth counterpart.
 
-Toolchain: Plinth `1.64.0.0`, Plutarch `1.12.0`, GHC `9.6.6`. All ratios are **Plinth / Plutarch** (values below `1.00x` indicate Plinth is smaller or cheaper). 
+Toolchain: Plinth `1.65.0.0`, Plutarch `1.12.0`, GHC `9.6.6`. All ratios are **Plinth / Plutarch** (values below `1.00x` indicate Plinth is smaller or cheaper). 
 
 ### Script Sizes and eLOC
 
