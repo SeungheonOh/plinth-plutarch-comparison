@@ -8,8 +8,8 @@ const urls = [...markdown.matchAll(/\((https:\/\/plinth\.isotopy\.xyz\/#p=z[^)]+
   (match) => match[1],
 );
 
-if (urls.length !== 16) {
-  throw new Error(`Expected 16 encoded playground links, found ${urls.length}`);
+if (urls.length !== 26) {
+  throw new Error(`Expected 26 encoded playground links, found ${urls.length}`);
 }
 
 for (const [index, url] of urls.entries()) {

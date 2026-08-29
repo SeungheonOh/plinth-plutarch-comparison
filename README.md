@@ -2,7 +2,7 @@
 
 ## Browser playground
 
-Open any of the complete Plinth and Plutarch implementations from the generated [playground links](./playground-links.md). Each link loads every required module into [Plinth Playground](https://plinth.isotopy.xyz/) and is ready to compile in the browser.
+Open the paper's introductory recursion example, the complete validator pairs, and selected compiler-diagnostic comparisons from the generated [playground links](./playground-links.md). Each link loads every required module into [Plinth Playground](https://plinth.isotopy.xyz/) and is ready to compile in the browser. Diagnostic examples are intentionally broken so their Plinth and Plutarch error messages can be compared directly.
 
 This repository ports 7 Cardano smart contracts to both Plinth and Plutarch from their original implementations. The table below summarizes each contract's script purpose, original source, and the language it was originally written in.
 

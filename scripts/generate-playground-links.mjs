@@ -7,6 +7,23 @@ const playgroundOrigin = "https://plinth.isotopy.xyz/";
 
 const examples = [
   {
+    slug: "net-withdraw",
+    category: "learn",
+    title: "Recursive withdrawals",
+    description:
+      "The paper's compact introductory example: algebraic data, pattern matching, recursion, and integer arithmetic side by side.",
+    plutarch: {
+      module: "Sample.Sample",
+      entry: "netWithdraw",
+      files: ["src/Sample/Sample.hs"],
+    },
+    plinth: {
+      module: "Sample.SamplePlinth",
+      entry: "netWithdrawUPLC",
+      files: ["src/Sample/SamplePlinth.hs"],
+    },
+  },
+  {
     slug: "smart-tokens",
     title: "Smart Tokens",
     description: "CIP-143 programmable token logic",
@@ -166,6 +183,131 @@ const examples = [
       files: ["src/Voting/Contracts/VotingPlinth.hs"],
     },
   },
+  {
+    slug: "missing-equality-constraint",
+    category: "diagnostics",
+    mode: "diagnostic",
+    title: "Missing equality constraint",
+    description:
+      "Compare a missing Eq constraint in Plinth with the corresponding PEq constraint in Plutarch.",
+    plutarch: {
+      module: "E08Plutarch",
+      files: [
+        {
+          path: "src-errormsg/E08-MissingEq/Plutarch.hs",
+          name: "E08Plutarch.hs",
+        },
+      ],
+    },
+    plinth: {
+      module: "E08Plinth",
+      files: [
+        {
+          path: "src-errormsg/E08-MissingEq/Plinth.hs",
+          name: "E08Plinth.hs",
+        },
+      ],
+    },
+  },
+  {
+    slug: "missing-data-constraint",
+    category: "diagnostics",
+    mode: "diagnostic",
+    title: "Missing on-chain data constraint",
+    description:
+      "See how generic on-chain data requires ToData/UnsafeFromData in Plinth and PIsData in Plutarch.",
+    plutarch: {
+      module: "E10Plutarch",
+      files: [
+        {
+          path: "src-errormsg/E10-MissingDataConstraint/Plutarch.hs",
+          name: "E10Plutarch.hs",
+        },
+      ],
+    },
+    plinth: {
+      module: "E10Plinth",
+      files: [
+        {
+          path: "src-errormsg/E10-MissingDataConstraint/Plinth.hs",
+          name: "E10Plinth.hs",
+        },
+      ],
+    },
+  },
+  {
+    slug: "missing-application-parentheses",
+    category: "diagnostics",
+    mode: "diagnostic",
+    title: "Function application and parentheses",
+    description:
+      "Contrast ordinary Haskell application with Plutarch's # operator when parentheses are missing.",
+    plutarch: {
+      module: "E12Plutarch",
+      files: [
+        {
+          path: "src-errormsg/E12-MissingAppParens/Plutarch.hs",
+          name: "E12Plutarch.hs",
+        },
+      ],
+    },
+    plinth: {
+      module: "E12Plinth",
+      files: [
+        {
+          path: "src-errormsg/E12-MissingAppParens/Plinth.hs",
+          name: "E12Plinth.hs",
+        },
+      ],
+    },
+  },
+  {
+    slug: "broken-recursion",
+    category: "diagnostics",
+    mode: "diagnostic",
+    title: "Broken recursion",
+    description:
+      "Compare accidental name shadowing in direct Plinth recursion with an incorrectly constructed Plutarch recursive term.",
+    plutarch: {
+      module: "E24Plutarch",
+      files: [
+        {
+          path: "src-errormsg/E24-BrokenRecursion/Plutarch.hs",
+          name: "E24Plutarch.hs",
+        },
+      ],
+    },
+    plinth: {
+      module: "E24Plinth",
+      files: [
+        {
+          path: "src-errormsg/E24-BrokenRecursion/Plinth.hs",
+          name: "E24Plinth.hs",
+        },
+      ],
+    },
+  },
+];
+
+const sections = [
+  {
+    id: "learn",
+    title: "Start with the paper example",
+    description:
+      "A small, complete program that makes the surface-language differences easy to see before moving into ledger APIs.",
+  },
+  {
+    id: "validators",
+    title: "Validator case studies",
+    description:
+      "Production-shaped contracts covering the major Cardano script purposes and common ledger operations.",
+  },
+  {
+    id: "diagnostics",
+    title: "Learn from compiler diagnostics",
+    description:
+      "These projects are intentionally broken. Compile both versions and compare how each language explains the same class of mistake.",
+  },
 ];
 
 function moduleFilename(sourcePath) {
@@ -228,21 +370,34 @@ main = ${implementation.entry} \`seq\` pure ()
 `;
 }
 
+function diagnosticMain(implementation) {
+  return `module Main where
+
+import ${implementation.module} ()
+
+main :: IO ()
+main = pure ()
+`;
+}
+
 async function projectFor(example, language) {
   const implementation = example[language];
   const modules = [
     {
       name: "Main.hs",
       source:
-        language === "plutarch"
+        example.mode === "diagnostic"
+          ? diagnosticMain(implementation)
+          : language === "plutarch"
           ? plutarchMain(example, implementation)
           : plinthMain(implementation),
     },
   ];
 
-  for (const sourcePath of implementation.files) {
+  for (const file of implementation.files) {
+    const sourcePath = typeof file === "string" ? file : file.path;
     modules.push({
-      name: moduleFilename(sourcePath),
+      name: typeof file === "string" ? moduleFilename(sourcePath) : file.name,
       source: browserCompatibleSource(await readFile(sourcePath, "utf8")),
     });
   }
@@ -273,6 +428,7 @@ const linkedExamples = [];
 for (const example of examples) {
   linkedExamples.push({
     ...example,
+    category: example.category ?? "validators",
     plinthUrl: projectUrl(await projectFor(example, "plinth")),
     plutarchUrl: projectUrl(await projectFor(example, "plutarch")),
   });
@@ -281,29 +437,65 @@ for (const example of examples) {
 const markdown = [
   "# Funarch playground examples",
   "",
-  "Each link opens a complete multi-module project in [Plinth Playground](https://plinth.isotopy.xyz/) with the source loaded and ready to compile.",
+  "Each link opens a complete project in [Plinth Playground](https://plinth.isotopy.xyz/) with its source loaded and ready to compile.",
   "",
-  ...linkedExamples.flatMap((example) => [
-    `## ${example.title}`,
+  "The final section contains intentional mistakes from the paper's compiler-diagnostics study; those examples are expected to fail and are useful for comparing the two error messages.",
+  "",
+  ...sections.flatMap((section) => [
+    `## ${section.title}`,
     "",
-    `- [Open the Plinth implementation](${example.plinthUrl})`,
-    `- [Open the Plutarch implementation](${example.plutarchUrl})`,
+    section.description,
     "",
+    ...linkedExamples
+      .filter((example) => example.category === section.id)
+      .flatMap((example) => [
+        `### ${example.title}`,
+        "",
+        example.description,
+        "",
+        `- [Open the Plinth ${example.mode === "diagnostic" ? "error example" : "implementation"}](${example.plinthUrl})`,
+        `- [Open the Plutarch ${example.mode === "diagnostic" ? "error example" : "implementation"}](${example.plutarchUrl})`,
+        "",
+      ]),
   ]),
 ].join("\n");
 
-const cards = linkedExamples
-  .map(
-    (example) => `
-      <section>
-        <h2>${escapeHtml(example.title)}</h2>
-        <p>${escapeHtml(example.description)}</p>
-        <ul>
-          <li><a href="${escapeHtml(example.plinthUrl)}">Open the Plinth implementation <span aria-hidden="true">→</span></a></li>
-          <li><a href="${escapeHtml(example.plutarchUrl)}">Open the Plutarch implementation <span aria-hidden="true">→</span></a></li>
-        </ul>
-      </section>`,
-  )
+const collections = sections
+  .map((section) => {
+    const cards = linkedExamples
+      .filter((example) => example.category === section.id)
+      .map(
+        (example) => `
+        <article class="example">
+          <div class="example-heading">
+            <h3>${escapeHtml(example.title)}</h3>
+            <span class="label${example.mode === "diagnostic" ? " diagnostic" : ""}">${
+              example.mode === "diagnostic"
+                ? "Intentional error"
+                : section.id === "learn"
+                  ? "Guided example"
+                  : "Case study"
+            }</span>
+          </div>
+          <p>${escapeHtml(example.description)}</p>
+          <ul>
+            <li><a href="${escapeHtml(example.plinthUrl)}">Plinth <span aria-hidden="true">→</span></a></li>
+            <li><a href="${escapeHtml(example.plutarchUrl)}">Plutarch <span aria-hidden="true">→</span></a></li>
+          </ul>
+        </article>`,
+      )
+      .join("");
+
+    return `
+      <section class="collection" aria-labelledby="${section.id}-heading">
+        <div class="collection-heading">
+          <h2 id="${section.id}-heading">${escapeHtml(section.title)}</h2>
+          <p>${escapeHtml(section.description)}</p>
+        </div>
+        <div class="examples">${cards}
+        </div>
+      </section>`;
+  })
   .join("");
 
 const html = `<!doctype html>
@@ -317,27 +509,40 @@ const html = `<!doctype html>
     :root { color-scheme: light; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #17211d; background: #f7f9f8; }
     * { box-sizing: border-box; }
     body { margin: 0; }
-    main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 64px 0 80px; }
-    header { padding-bottom: 28px; border-bottom: 1px solid #ced8d3; }
+    main { width: min(820px, calc(100% - 32px)); margin: 0 auto; padding: 56px 0 80px; }
+    header { padding-bottom: 30px; border-bottom: 1px solid #ced8d3; }
     h1 { margin: 0 0 12px; font: 700 clamp(2rem, 7vw, 3.5rem)/1.04 ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.055em; }
     header p { max-width: 650px; margin: 0; color: #55635d; line-height: 1.65; }
-    section { padding: 27px 0 24px; border-bottom: 1px solid #dbe2df; }
-    h2 { margin: 0 0 8px; font: 650 1.08rem/1.4 ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.015em; }
-    section p { margin: 0 0 15px; color: #66736d; font-size: .86rem; line-height: 1.55; }
-    ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .collection { padding: 34px 0 8px; border-bottom: 1px solid #ced8d3; }
+    .collection-heading { max-width: 660px; margin-bottom: 24px; }
+    h2 { margin: 0 0 7px; font: 700 1.3rem/1.35 ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.025em; }
+    .collection-heading p, .example p { margin: 0; color: #66736d; font-size: .86rem; line-height: 1.6; }
+    .examples { border-top: 1px solid #dbe2df; }
+    .example { padding: 22px 0 24px; border-bottom: 1px solid #dbe2df; }
+    .example:last-child { border-bottom: 0; }
+    .example-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 7px; }
+    h3 { margin: 0; font: 650 1rem/1.4 ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.012em; }
+    .label { flex: none; padding: 3px 7px; border: 1px solid #bfd1ca; border-radius: 999px; color: #477064; background: #eff7f4; font-size: .68rem; line-height: 1.25; }
+    .label.diagnostic { border-color: #e2c89c; color: #7a5213; background: #fff8e9; }
+    .example p { max-width: 680px; margin-bottom: 14px; }
+    ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
     a { color: #087356; text-underline-offset: 3px; }
     li a { display: flex; justify-content: space-between; gap: 20px; padding: 11px 13px; border: 1px solid #c9d5d0; border-radius: 5px; background: #fff; text-decoration: none; }
     li a:hover, li a:focus-visible { border-color: #087356; background: #f1faf6; outline: none; }
     footer { padding-top: 26px; color: #66736d; font-size: .8rem; line-height: 1.6; }
-    @media (max-width: 520px) { main { width: min(100% - 24px, 760px); padding-top: 36px; } }
+    @media (max-width: 520px) {
+      main { width: min(100% - 24px, 820px); padding-top: 36px; }
+      ul { grid-template-columns: 1fr; }
+      .example-heading { align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
   <main>
     <header>
       <h1>Funarch examples</h1>
-      <p>Plinth and Plutarch implementations of eight Cardano validators. Choose an implementation to open its complete multi-module source in Plinth Playground, ready to compile in your browser.</p>
-    </header>${cards}
+      <p>Learn Plinth and Plutarch side by side with the paper's introductory program, complete Cardano validators, and paired compiler-error examples. Every link opens editable source in the browser.</p>
+    </header>${collections}
     <footer>
       Source: <a href="https://github.com/SeungheonOh/plinth-plutarch-comparison">plinth-plutarch-comparison</a><br>
       Plain list: <a href="/playground-links.md">playground-links.md</a>
