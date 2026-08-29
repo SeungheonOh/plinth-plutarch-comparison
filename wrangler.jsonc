@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "funarch26",
+  "account_id": "e855335a6175305976cc984075979c30",
+  "compatibility_date": "2026-08-29",
+  "assets": {
+    "directory": "./site",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    {
+      "pattern": "funarch26.isotopy.xyz",
+      "custom_domain": true
+    }
+  ]
+}

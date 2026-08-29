@@ -1,0 +1,13 @@
+{
+  "name": "funarch-playground-links",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "node scripts/generate-playground-links.mjs",
+    "check": "node scripts/check-playground-links.mjs",
+    "deploy": "npm run generate && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.34.0"
+  }
+}

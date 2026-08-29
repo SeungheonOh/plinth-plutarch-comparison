@@ -1,5 +1,9 @@
 # Plinth Plutarch Paper Codes
 
+## Browser playground
+
+Open any of the complete Plinth and Plutarch implementations from the generated [playground links](./playground-links.md). Each link loads every required module into [Plinth Playground](https://plinth.isotopy.xyz/) and is ready to compile in the browser.
+
 This repository ports 7 Cardano smart contracts to both Plinth and Plutarch from their original implementations. The table below summarizes each contract's script purpose, original source, and the language it was originally written in.
 
 | Validator | Script Purpose | Original Source | Original Language | Description |
