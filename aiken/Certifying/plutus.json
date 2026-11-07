@@ -1,0 +1,59 @@
+{
+  "preamble": {
+    "title": "cross-bench/certifying",
+    "description": "Aiken contracts for project 'cross-bench/certifying'",
+    "version": "0.0.0",
+    "plutusVersion": "v3",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.1.24+unknown"
+    },
+    "license": "Apache-2.0"
+  },
+  "validators": [
+    {
+      "title": "certifying.certifying.publish",
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Data"
+        }
+      },
+      "parameters": [
+        {
+          "title": "expiration",
+          "schema": {
+            "$ref": "#/definitions/Int"
+          }
+        }
+      ],
+      "compiledCode": "590139010100229800aba2aba1aab9eaab9dab9a9bad00248888896600264646644b30013370e900318039baa0018991919912cc004cdc3a400000514a3132598009800801c4c8c8c966002600800313259800980298081baa3012301330113754602460226ea8012266e20038006266e2403800500f1bad30113010375400515980099b87480000062942294500e201c300e3754002601e601c6ea8c03cc038dd50009807180798079807980798079807980798069baa300e0098acc004cdc3a400800713375e980107d87a9fd87a80ff00300e300f300d375400915980099b874801800e266ebd300107d87a9fd87a80ff00300e300f300d375400914a0805900b2016370e90012014300937540026eb4c02c008c028c02c004c020dd5000c59006180380098039804000980380098021baa0078a4d13656400801",
+      "hash": "6ba482ff6f307e285a5f0e85dbe8e1f29a8bdc6d3ab78084ae16d99e"
+    },
+    {
+      "title": "certifying.certifying.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "parameters": [
+        {
+          "title": "expiration",
+          "schema": {
+            "$ref": "#/definitions/Int"
+          }
+        }
+      ],
+      "compiledCode": "590139010100229800aba2aba1aab9eaab9dab9a9bad00248888896600264646644b30013370e900318039baa0018991919912cc004cdc3a400000514a3132598009800801c4c8c8c966002600800313259800980298081baa3012301330113754602460226ea8012266e20038006266e2403800500f1bad30113010375400515980099b87480000062942294500e201c300e3754002601e601c6ea8c03cc038dd50009807180798079807980798079807980798069baa300e0098acc004cdc3a400800713375e980107d87a9fd87a80ff00300e300f300d375400915980099b874801800e266ebd300107d87a9fd87a80ff00300e300f300d375400914a0805900b2016370e90012014300937540026eb4c02c008c028c02c004c020dd5000c59006180380098039804000980380098021baa0078a4d13656400801",
+      "hash": "6ba482ff6f307e285a5f0e85dbe8e1f29a8bdc6d3ab78084ae16d99e"
+    }
+  ],
+  "definitions": {
+    "Data": {
+      "title": "Data",
+      "description": "Any Plutus data."
+    },
+    "Int": {
+      "dataType": "integer"
+    }
+  }
+}
