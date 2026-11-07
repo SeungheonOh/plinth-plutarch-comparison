@@ -46,12 +46,23 @@ main = do
       [dir] | not ("-" `isPrefixOf` dir) -> exportAll dir
       _ -> usage
     "run" : rest -> either (const usage) runAll (parseRunOptions rest)
+    "inspect" : rest -> either (const usage) inspect (parseRunOptions rest)
+    ["assemble", input, output] -> do
+      text <- readFile input
+      case parseProgramText text of
+        Left err -> hPutStrLn stderr err >> exitWith (ExitFailure 1)
+        Right prog -> do
+          let bytes = encodeFlat prog
+          writeFile output (encodeHex bytes ++ "\n")
+          hPutStrLn stderr (output ++ ": flat " ++ show (BS.length bytes) ++ " bytes")
     _ -> usage
 
 usage :: IO a
 usage = do
   hPutStrLn stderr "usage: cross-bench export [DIR]"
   hPutStrLn stderr "       cross-bench run [DIR] [--validator V] [--no-fail]"
+  hPutStrLn stderr "       cross-bench inspect [DIR] --validator V [--case NAME]"
+  hPutStrLn stderr "       cross-bench assemble IN.uplc OUT.flat.hex"
   exitWith (ExitFailure 2)
 
 -- ============================================================================
@@ -208,12 +219,14 @@ data RunOptions = RunOptions
   { roDir :: FilePath
   , roValidator :: Maybe String
   , roNoFail :: Bool
+  , roCase :: Maybe String
   }
 
 parseRunOptions :: [String] -> Either String RunOptions
-parseRunOptions = go (RunOptions defaultDataDir Nothing False) False
+parseRunOptions = go (RunOptions defaultDataDir Nothing False Nothing) False
   where
     go opts _ [] = Right opts
+    go opts seenDir ("--case" : c : rest) = go opts {roCase = Just c} seenDir rest
     go opts seenDir ("--validator" : v : rest) = go opts {roValidator = Just v} seenDir rest
     go opts seenDir ("--no-fail" : rest) = go opts {roNoFail = True} seenDir rest
     go opts False (d : rest) | not ("-" `isPrefixOf` d) = go opts {roDir = d} True rest
@@ -415,3 +428,35 @@ summarise validator cases scripts mismatches = do
 
 padRight :: Int -> String -> String
 padRight n s = s ++ replicate (n - length s) ' '
+
+-- ============================================================================
+-- inspect
+-- ============================================================================
+
+{- | Without --case, write a readable rendering of every script of the validator
+to DIR/<Validator>/pretty/<compiler>.uplc. With --case NAME, print the
+variant C cost breakdown (machine steps and builtins) of every script on that
+case.
+-}
+inspect :: RunOptions -> IO ()
+inspect opts = case roValidator opts of
+  Nothing -> usage
+  Just validator -> do
+    let vdir = roDir opts </> validator
+    (scripts, _) <- loadScripts validator vdir
+    case roCase opts of
+      Nothing -> do
+        createDirectoryIfMissing True (vdir </> "pretty")
+        forM_ scripts $ \s -> do
+          let out = vdir </> "pretty" </> (lsCompiler s ++ ".uplc")
+          writeFile out (prettyProgram (lsProgram s) ++ "\n")
+          hPutStrLn stderr ("wrote " ++ out)
+      Just name -> do
+        casesOrErr <- readCases (vdir </> "cases.csv")
+        case casesOrErr of
+          Left err -> hPutStrLn stderr err >> exitWith (ExitFailure 1)
+          Right cases -> case [c | c <- cases, rcName c == name] of
+            [] -> hPutStrLn stderr ("no case named " ++ show name) >> exitWith (ExitFailure 1)
+            c : _ -> forM_ scripts $ \s -> do
+              putStrLn ("=== " ++ lsCompiler s)
+              putStrLn (tallyReport VariantC (lsProgram s) (rcArgs c))

@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 {- | Script encoding and evaluation for the cross-language benchmark.
 
@@ -25,7 +26,19 @@ module CrossBench.Eval (
   decodeHex,
   serialiseData,
   deserialiseData,
+  tallyReport,
+  prettyProgram,
+  parseProgramText,
 ) where
+
+import Data.Text qualified as T
+import PlutusCore.Error (ParserErrorBundle)
+import PlutusCore.Pretty (prettyPlcClassic)
+import UntypedPlutusCore.Parser qualified as UPLCParser
+
+import Control.Monad.Except (runExcept)
+import PlutusCore.Pretty (display, render)
+import PlutusCore.Quote (runQuoteT)
 
 import Codec.Serialise (deserialiseOrFail, serialise)
 import Data.Bits (shiftL, shiftR, (.&.), (.|.))
@@ -171,3 +184,34 @@ deserialiseData :: BS.ByteString -> Either String Data
 deserialiseData bs = case deserialiseOrFail (LBS.fromStrict bs) of
   Left err -> Left ("Data CBOR decoding failed: " ++ show err)
   Right d -> Right d
+
+-- | Evaluate like 'evaluate', but in tallying mode, and render the per-step and
+-- per-builtin cost breakdown.
+tallyReport :: CostVariant -> Program -> [Data] -> String
+tallyReport variant (UPLC.Program _ _ body) args =
+  let applied = foldl (\f a -> UPLC.Apply () f (UPLC.Constant () (PLC.someValue a))) body args
+      term = UPLC.termMapNames UPLC.fakeNameDeBruijn applied
+      params = defaultCekParametersForVariant (semanticsVariant variant)
+      Cek.CekReport res st _logs = Cek.runCekDeBruijn params Cek.tallying Cek.noEmitter term
+      status = case res of
+        Cek.CekFailure _ -> "FAIL"
+        _ -> "OK"
+   in status ++ "\n" ++ display st
+
+-- | Readable rendering of a program with generated variable names.
+prettyProgram :: Program -> String
+prettyProgram (UPLC.Program _ _ body) =
+  case runExcept (runQuoteT (UPLC.unDeBruijnTerm (UPLC.termMapNames UPLC.fakeNameDeBruijn body))) of
+    Left (err :: UPLC.FreeVariableError) -> "free variable: " ++ show err
+    Right named -> render (prettyPlcClassic (UPLC.Program () (UPLC.Version 1 1 0) named))
+
+-- | Parse a program in the classic textual syntax (as written by
+-- 'prettyProgram') back into a DeBruijn program.
+parseProgramText :: String -> Either String Program
+parseProgramText text = do
+  UPLC.Program _ ver named <-
+    either (\(e :: ParserErrorBundle) -> Left (display e)) Right $
+      runExcept (runQuoteT (UPLCParser.parseProgram (T.pack text)))
+  db <- either (\(e :: UPLC.FreeVariableError) -> Left (show e)) Right $
+    runExcept (UPLC.deBruijnTerm named)
+  pure (UPLC.Program () ver (UPLC.termMapNames UPLC.unNameDeBruijn (() <$ db)))

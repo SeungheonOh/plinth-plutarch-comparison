@@ -150,6 +150,8 @@ executable cross-bench
   build-depends:
     , bytestring
     , directory
+    , mtl
+    , text
     , filepath
     , plinth-plutarch-paper-code
     , plutarch
