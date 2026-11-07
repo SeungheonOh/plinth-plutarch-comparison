@@ -125,6 +125,45 @@ executable bench-scripts
     , tasty-hunit
     , tasty-quickcheck
 
+executable cross-bench
+  import:         base, project-config
+  hs-source-dirs: app test
+  main-is:        CrossBench.hs
+  ghc-options:
+    -threaded -rtsopts -Wno-missing-import-lists
+    -Wno-missing-export-lists
+
+  other-modules:
+    Certifying.Test.Certifying
+    Constitution.Test.ConstitutionSorted
+    CrossBench.Cases
+    CrossBench.Csv
+    CrossBench.Eval
+    Crowdfund.Test.Crowdfund
+    Hydra.Test.Head
+    ProgrammableTokens.Test.ProgrammableLogicGlobal
+    ProgrammableTokens.Test.ScriptContext.Builder
+    Settings.Test.Settings
+    Vesting.Test.Vesting
+    Voting.Test.Voting
+
+  build-depends:
+    , bytestring
+    , directory
+    , filepath
+    , plinth-plutarch-paper-code
+    , plutarch
+    , plutarch-ledger-api
+    , plutus-core
+    , plutus-core:flat
+    , plutus-ledger-api
+    , plutus-tx
+    , QuickCheck
+    , serialise
+    , tasty
+    , tasty-hunit
+    , tasty-quickcheck
+
 test-suite conformance-tests
   import:         base, project-config
   type:           exitcode-stdio-1.0
