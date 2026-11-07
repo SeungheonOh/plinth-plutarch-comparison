@@ -1,0 +1,76 @@
+{
+  "preamble": {
+    "title": "cross-bench/voting",
+    "description": "Aiken contracts for project 'cross-bench/voting'",
+    "version": "0.0.0",
+    "plutusVersion": "v3",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.1.24+unknown"
+    },
+    "license": "Apache-2.0"
+  },
+  "validators": [
+    {
+      "title": "voting.voting.vote",
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Data"
+        }
+      },
+      "parameters": [
+        {
+          "title": "policy_id",
+          "schema": {
+            "$ref": "#/definitions/cardano~1assets~1PolicyId"
+          }
+        },
+        {
+          "title": "asset_name",
+          "schema": {
+            "$ref": "#/definitions/cardano~1assets~1AssetName"
+          }
+        }
+      ],
+      "compiledCode": "5901240101002229800aba2aba1aab9faab9eaab9dab9a9bae0039bae0024888888896600264646644b30013370e900418041baa00189991198008009bac300d300b3754601a00c601660126ea8004896600200314a115980099b8748008c8cc88cc0080080048966002003003899192cc004cdc8806000c56600266e3c03000626eb4c04000a00a807226600800860260068070dd718070009808000a01e3232330010013756646002601e6ea8c004c03cdd51808802918089809000912cc004006007132325980099b9100e0018acc004cdc7807000c4dd59808801401500f44cc010010c05000d00f1bae300f00130110014040297adef6c601480022946266004004601c002804900c459007180480098049805000980480098029baa0098a4d13656400c1",
+      "hash": "3562227904c7a6d7b38abfd569b770b7be3a4a1bcc7f428e245cd111"
+    },
+    {
+      "title": "voting.voting.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "parameters": [
+        {
+          "title": "policy_id",
+          "schema": {
+            "$ref": "#/definitions/cardano~1assets~1PolicyId"
+          }
+        },
+        {
+          "title": "asset_name",
+          "schema": {
+            "$ref": "#/definitions/cardano~1assets~1AssetName"
+          }
+        }
+      ],
+      "compiledCode": "5901240101002229800aba2aba1aab9faab9eaab9dab9a9bae0039bae0024888888896600264646644b30013370e900418041baa00189991198008009bac300d300b3754601a00c601660126ea8004896600200314a115980099b8748008c8cc88cc0080080048966002003003899192cc004cdc8806000c56600266e3c03000626eb4c04000a00a807226600800860260068070dd718070009808000a01e3232330010013756646002601e6ea8c004c03cdd51808802918089809000912cc004006007132325980099b9100e0018acc004cdc7807000c4dd59808801401500f44cc010010c05000d00f1bae300f00130110014040297adef6c601480022946266004004601c002804900c459007180480098049805000980480098029baa0098a4d13656400c1",
+      "hash": "3562227904c7a6d7b38abfd569b770b7be3a4a1bcc7f428e245cd111"
+    }
+  ],
+  "definitions": {
+    "Data": {
+      "title": "Data",
+      "description": "Any Plutus data."
+    },
+    "cardano/assets/AssetName": {
+      "title": "AssetName",
+      "dataType": "bytes"
+    },
+    "cardano/assets/PolicyId": {
+      "title": "PolicyId",
+      "dataType": "bytes"
+    }
+  }
+}
