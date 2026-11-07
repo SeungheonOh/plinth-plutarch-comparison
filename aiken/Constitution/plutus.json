@@ -1,0 +1,245 @@
+{
+  "preamble": {
+    "title": "cross-bench/constitution",
+    "description": "Aiken contracts for project 'cross-bench/constitution'",
+    "version": "0.0.0",
+    "plutusVersion": "v3",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.1.24+unknown"
+    },
+    "license": "Apache-2.0"
+  },
+  "validators": [
+    {
+      "title": "constitution.constitution.propose",
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Data"
+        }
+      },
+      "parameters": [
+        {
+          "title": "config",
+          "schema": {
+            "$ref": "#/definitions/List<types~1ConfigEntry>"
+          }
+        }
+      ],
+      "compiledCode": "59032e010100229800aba2aba1aab9faab9eaab9dab9a9bac002488888896600264653001300800198041804800cc0200092225980099b8748028c020dd500144c8ca600260146ea80066e1d20009bad300d0024889660026004007133223232329800800c880060213756602a602c60266ea8025001111980091112cc00401229422653001375a6036003301b301c001980e002a444b30013370e00e007159800cc00488006005006402d19800805488006003005402914a080d22b30013371000600f1980080548800a003007803401500a45282034406830183754603400880c8896600200314a31329800802c8800a007375a602c0033017001980d001200a3018001405c6002002446600244b30010028acc00400629462941015456600200314a1159800cc004012440033016002980b000a0088cc004012440053017002980b800a0088a50404880a90151119912cc004c02800a264660106eb0c064c05cdd500291919912cc004c03c00626601a004466e2400401a2b30013006001899806801119b8900600189980680114c004cdc3800803528528a034406480c8dd6180d980e000980c1baa301b001301837540026eb400e2b30013001002899194c004c06c0066eb4c0680066eb4c0680092223300c3758603a60366ea80248c8cc896600260260031330100022323371266e08dd6981180080419b82007375a6046604800260406ea80062b3001300a00189980800111919b893370400e6eb4c08cc090004cdc11bad302300100830203754003133010002232980099b87337046eb4c08c004020cdc10039bad30233024001a50a51407c60406ea800501d203a3758603e604000260386ea8c07c004c070dd50008c068004dd6001c56600266e1d20040028cc00401a4400537586030602c6ea80126eb000d0064528a028405080a0c04cdd50011b874800888c8cc00400400c896600200314a315980098019bad3014001899801001180a800c5282020404c44646600200200644b30010018a518acc004c00cc050006266004004602a00314a08081013456600266e1d20040038a518a50403080606018601a601a60146ea8c030c034004c024dd50014590070c020004c010dd5004452689b2b20041",
+      "hash": "1f911e3955af58bf1892f6be319f426af153d7c8d31b35c77865f3d2"
+    },
+    {
+      "title": "constitution.constitution.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "parameters": [
+        {
+          "title": "config",
+          "schema": {
+            "$ref": "#/definitions/List<types~1ConfigEntry>"
+          }
+        }
+      ],
+      "compiledCode": "59032e010100229800aba2aba1aab9faab9eaab9dab9a9bac002488888896600264653001300800198041804800cc0200092225980099b8748028c020dd500144c8ca600260146ea80066e1d20009bad300d0024889660026004007133223232329800800c880060213756602a602c60266ea8025001111980091112cc00401229422653001375a6036003301b301c001980e002a444b30013370e00e007159800cc00488006005006402d19800805488006003005402914a080d22b30013371000600f1980080548800a003007803401500a45282034406830183754603400880c8896600200314a31329800802c8800a007375a602c0033017001980d001200a3018001405c6002002446600244b30010028acc00400629462941015456600200314a1159800cc004012440033016002980b000a0088cc004012440053017002980b800a0088a50404880a90151119912cc004c02800a264660106eb0c064c05cdd500291919912cc004c03c00626601a004466e2400401a2b30013006001899806801119b8900600189980680114c004cdc3800803528528a034406480c8dd6180d980e000980c1baa301b001301837540026eb400e2b30013001002899194c004c06c0066eb4c0680066eb4c0680092223300c3758603a60366ea80248c8cc896600260260031330100022323371266e08dd6981180080419b82007375a6046604800260406ea80062b3001300a00189980800111919b893370400e6eb4c08cc090004cdc11bad302300100830203754003133010002232980099b87337046eb4c08c004020cdc10039bad30233024001a50a51407c60406ea800501d203a3758603e604000260386ea8c07c004c070dd50008c068004dd6001c56600266e1d20040028cc00401a4400537586030602c6ea80126eb000d0064528a028405080a0c04cdd50011b874800888c8cc00400400c896600200314a315980098019bad3014001899801001180a800c5282020404c44646600200200644b30010018a518acc004c00cc050006266004004602a00314a08081013456600266e1d20040038a518a50403080606018601a601a60146ea8c030c034004c024dd50014590070c020004c010dd5004452689b2b20041",
+      "hash": "1f911e3955af58bf1892f6be319f426af153d7c8d31b35c77865f3d2"
+    }
+  ],
+  "definitions": {
+    "Data": {
+      "title": "Data",
+      "description": "Any Plutus data."
+    },
+    "Int": {
+      "dataType": "integer"
+    },
+    "List<Int>": {
+      "dataType": "list",
+      "items": {
+        "$ref": "#/definitions/Int"
+      }
+    },
+    "List<types/ConfigEntry>": {
+      "dataType": "list",
+      "items": {
+        "$ref": "#/definitions/types~1ConfigEntry"
+      }
+    },
+    "List<types/Fraction>": {
+      "dataType": "list",
+      "items": {
+        "$ref": "#/definitions/types~1Fraction"
+      }
+    },
+    "List<types/IntPredicate>": {
+      "dataType": "list",
+      "items": {
+        "$ref": "#/definitions/types~1IntPredicate"
+      }
+    },
+    "List<types/ParamValue>": {
+      "dataType": "list",
+      "items": {
+        "$ref": "#/definitions/types~1ParamValue"
+      }
+    },
+    "List<types/RationalPredicate>": {
+      "dataType": "list",
+      "items": {
+        "$ref": "#/definitions/types~1RationalPredicate"
+      }
+    },
+    "types/ConfigEntry": {
+      "title": "ConfigEntry",
+      "description": "`(Integer, ParamValue)`, i.e. `Constr 0 [I param_id, rule]`.",
+      "anyOf": [
+        {
+          "title": "ConfigEntry",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "param_id",
+              "$ref": "#/definitions/Int"
+            },
+            {
+              "title": "rule",
+              "$ref": "#/definitions/types~1ParamValue"
+            }
+          ]
+        }
+      ]
+    },
+    "types/Fraction": {
+      "title": "Fraction",
+      "description": "`(Integer, Integer)`, i.e. `Constr 0 [I numerator, I denominator]`.",
+      "anyOf": [
+        {
+          "title": "Fraction",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "numerator",
+              "$ref": "#/definitions/Int"
+            },
+            {
+              "title": "denominator",
+              "$ref": "#/definitions/Int"
+            }
+          ]
+        }
+      ]
+    },
+    "types/IntPredicate": {
+      "title": "IntPredicate",
+      "description": "`(PredKey, [Integer])`, i.e. `Constr 0 [key, [I ..]]`.",
+      "anyOf": [
+        {
+          "title": "IntPredicate",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "key",
+              "$ref": "#/definitions/types~1PredKey"
+            },
+            {
+              "title": "expected",
+              "$ref": "#/definitions/List<Int>"
+            }
+          ]
+        }
+      ]
+    },
+    "types/ParamValue": {
+      "title": "ParamValue",
+      "description": "Guardrail for one protocol parameter.",
+      "anyOf": [
+        {
+          "title": "ParamInteger",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "$ref": "#/definitions/List<types~1IntPredicate>"
+            }
+          ]
+        },
+        {
+          "title": "ParamRational",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": [
+            {
+              "$ref": "#/definitions/List<types~1RationalPredicate>"
+            }
+          ]
+        },
+        {
+          "title": "ParamList",
+          "dataType": "constructor",
+          "index": 2,
+          "fields": [
+            {
+              "$ref": "#/definitions/List<types~1ParamValue>"
+            }
+          ]
+        },
+        {
+          "title": "ParamAny",
+          "dataType": "constructor",
+          "index": 3,
+          "fields": []
+        }
+      ]
+    },
+    "types/PredKey": {
+      "title": "PredKey",
+      "description": "Comparison applied between each expected bound and the proposed value.\n Encoded as `Constr 0 []`, `Constr 1 []`, `Constr 2 []`.",
+      "anyOf": [
+        {
+          "title": "MinValue",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        },
+        {
+          "title": "MaxValue",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": []
+        },
+        {
+          "title": "NotEqual",
+          "dataType": "constructor",
+          "index": 2,
+          "fields": []
+        }
+      ]
+    },
+    "types/RationalPredicate": {
+      "title": "RationalPredicate",
+      "description": "`(PredKey, [(Integer, Integer)])`, i.e. `Constr 0 [key, [fraction ..]]`.",
+      "anyOf": [
+        {
+          "title": "RationalPredicate",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "key",
+              "$ref": "#/definitions/types~1PredKey"
+            },
+            {
+              "title": "expected",
+              "$ref": "#/definitions/List<types~1Fraction>"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
