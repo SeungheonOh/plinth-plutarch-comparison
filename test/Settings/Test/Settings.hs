@@ -5,6 +5,7 @@ module Settings.Test.Settings (
   mkSettingsTests,
   mkSettingsConformanceTests,
   settingsBenchScenarios,
+  settingsUnitCases,
   bootUtxoRef,
 ) where
 
@@ -756,74 +757,90 @@ mkSettingsTests name script =
    in testGroup
         name
         [ testGroup
-            "Settings Admin Update"
-            [ testCase "update_scoopers_valid" $ assertSucceeds mkSettingsAdminUpdateScoopers
-            , testCase "update_base_fee_valid" $ assertSucceeds mkSettingsAdminUpdateBaseFee
-            , testCase "update_simple_fee_valid" $ assertSucceeds mkSettingsAdminUpdateSimpleFee
-            , testCase "update_strategy_fee_valid" $ assertSucceeds mkSettingsAdminUpdateStrategyFee
-            , testCase "update_pool_creation_fee_valid" $ assertSucceeds mkSettingsAdminUpdatePoolCreationFee
-            , testCase "update_metadata_admin_valid" $ assertSucceeds mkSettingsAdminUpdateMetadataAdmin
-            , testCase "update_settings_admin_valid" $ assertSucceeds mkSettingsAdminUpdateSettingsAdmin
-            , testCase "update_treasury_admin_valid" $ assertSucceeds mkSettingsAdminUpdateTreasuryAdmin
-            , testCase "update_extensions_valid" $ assertSucceeds mkSettingsAdminUpdateExtensions
-            , testCase "update_multiple_fields_valid" $ assertSucceeds mkSettingsAdminUpdateMultipleFieldsValid
-            , testCase "no_change_valid" $ assertSucceeds mkSettingsAdminNoChangeValid
-            , testCase "lovelace_change_valid" $ assertSucceeds mkSettingsAdminLovelaceChangeValid
-            , testCase "change_treasury_address_rejected" $
-                assertFails mkSettingsAdminChangeTreasuryAddressRejected
-            , testCase "change_staking_keys_rejected" $ assertFails mkSettingsAdminChangeStakingKeysRejected
-            , testCase "change_treasury_allowance_rejected" $
-                assertFails mkSettingsAdminChangeTreasuryAllowanceRejected
-            , testCase "wrong_signer_rejected" $ assertFails mkSettingsAdminWrongSignerRejected
-            , testCase "cross_redeemer_wrong_admin_rejected" $
-                assertFails mkSettingsAdminRedeemerTreasurySignerRejected
-            , testCase "value_changed_rejected" $ assertFails mkSettingsAdminValueChangedRejected
-            , testCase "mint_rejected" $ assertFails mkSettingsAdminMintRejected
-            , testCase "output_address_changed_rejected" $ assertFails mkSettingsAdminOutputAddressChangedRejected
-            , testCase "missing_output_datum_rejected" $ assertFails mkSettingsAdminMissingDatumRejected
+            groupName
+            [ testCase caseName $ if shouldSucceed then assertSucceeds ctx else assertFails ctx
+            | (caseName, shouldSucceed, ctx) <- cases
             ]
-        , testGroup
-            "Treasury Admin Update"
-            [ testCase "update_treasury_address_valid" $ assertSucceeds mkTreasuryAdminUpdateTreasuryAddress
-            , testCase "update_staking_keys_valid" $ assertSucceeds mkTreasuryAdminUpdateStakingKeys
-            , testCase "update_allowance_valid" $ assertSucceeds mkTreasuryAdminUpdateAllowance
-            , testCase "update_multiple_fields_valid" $ assertSucceeds mkTreasuryAdminUpdateMultipleFieldsValid
-            , testCase "no_change_valid" $ assertSucceeds mkTreasuryAdminNoChangeValid
-            , testCase "change_settings_admin_rejected" $ assertFails mkTreasuryAdminChangeSettingsAdminRejected
-            , testCase "change_metadata_admin_rejected" $ assertFails mkTreasuryAdminChangeMetadataAdminRejected
-            , testCase "change_treasury_admin_rejected" $ assertFails mkTreasuryAdminChangeTreasuryAdminRejected
-            , testCase "change_scoopers_rejected" $ assertFails mkTreasuryAdminChangeScoopersRejected
-            , testCase "change_base_fee_rejected" $ assertFails mkTreasuryAdminChangeBaseFeeRejected
-            , testCase "change_simple_fee_rejected" $ assertFails mkTreasuryAdminChangeSimpleFeeRejected
-            , testCase "change_strategy_fee_rejected" $ assertFails mkTreasuryAdminChangeStrategyFeeRejected
-            , testCase "change_pool_creation_fee_rejected" $
-                assertFails mkTreasuryAdminChangePoolCreationFeeRejected
-            , testCase "change_extensions_rejected" $ assertFails mkTreasuryAdminChangeExtensionsRejected
-            , testCase "wrong_signer_rejected" $ assertFails mkTreasuryAdminWrongSignerRejected
-            , testCase "cross_redeemer_wrong_admin_rejected" $
-                assertFails mkTreasuryAdminRedeemerSettingsSignerRejected
-            ]
-        , testGroup
-            "Multisig"
-            [ testCase "allof_both_signers_valid" $ assertSucceeds mkMultisigAllOfValid
-            , testCase "allof_partial_rejected" $ assertFails mkMultisigAllOfPartialRejected
-            , testCase "anyof_one_signer_valid" $ assertSucceeds mkMultisigAnyOfValid
-            , testCase "atleast_sufficient_valid" $ assertSucceeds mkMultisigAtLeastValid
-            , testCase "atleast_insufficient_rejected" $ assertFails mkMultisigAtLeastInsufficientRejected
-            , testCase "before_valid" $ assertSucceeds mkMultisigBeforeValid
-            , testCase "before_expired_rejected" $ assertFails mkMultisigBeforeExpiredRejected
-            , testCase "after_valid" $ assertSucceeds mkMultisigAfterValid
-            , testCase "after_too_early_rejected" $ assertFails mkMultisigAfterTooEarlyRejected
-            ]
-        , testGroup
-            "Mint"
-            [ testCase "mint_valid" $ assertSucceeds mkMintValidCtx
-            , testCase "mint_missing_boot_utxo_rejected" $ assertFails mkMintMissingBootUtxoRejected
-            , testCase "mint_not_paid_to_script_rejected" $ assertFails mkMintNotPaidToScriptRejected
-            , testCase "mint_wrong_quantity_rejected" $ assertFails mkMintWrongQuantityRejected
-            , testCase "mint_no_inline_datum_rejected" $ assertFails mkMintNoInlineDatumRejected
-            ]
+        | (groupName, cases) <- settingsUnitCases
         ]
+
+{- | Named unit cases, grouped as in the test tree: (test name, expected to
+succeed, arguments applied to the validator in order).
+-}
+settingsUnitCases :: [(String, [(String, Bool, ScriptContext)])]
+settingsUnitCases =
+  [
+    ( "Settings Admin Update"
+    ,
+      [ ("update_scoopers_valid", True, mkSettingsAdminUpdateScoopers)
+      , ("update_base_fee_valid", True, mkSettingsAdminUpdateBaseFee)
+      , ("update_simple_fee_valid", True, mkSettingsAdminUpdateSimpleFee)
+      , ("update_strategy_fee_valid", True, mkSettingsAdminUpdateStrategyFee)
+      , ("update_pool_creation_fee_valid", True, mkSettingsAdminUpdatePoolCreationFee)
+      , ("update_metadata_admin_valid", True, mkSettingsAdminUpdateMetadataAdmin)
+      , ("update_settings_admin_valid", True, mkSettingsAdminUpdateSettingsAdmin)
+      , ("update_treasury_admin_valid", True, mkSettingsAdminUpdateTreasuryAdmin)
+      , ("update_extensions_valid", True, mkSettingsAdminUpdateExtensions)
+      , ("update_multiple_fields_valid", True, mkSettingsAdminUpdateMultipleFieldsValid)
+      , ("no_change_valid", True, mkSettingsAdminNoChangeValid)
+      , ("lovelace_change_valid", True, mkSettingsAdminLovelaceChangeValid)
+      , ("change_treasury_address_rejected", False, mkSettingsAdminChangeTreasuryAddressRejected)
+      , ("change_staking_keys_rejected", False, mkSettingsAdminChangeStakingKeysRejected)
+      , ("change_treasury_allowance_rejected", False, mkSettingsAdminChangeTreasuryAllowanceRejected)
+      , ("wrong_signer_rejected", False, mkSettingsAdminWrongSignerRejected)
+      , ("cross_redeemer_wrong_admin_rejected", False, mkSettingsAdminRedeemerTreasurySignerRejected)
+      , ("value_changed_rejected", False, mkSettingsAdminValueChangedRejected)
+      , ("mint_rejected", False, mkSettingsAdminMintRejected)
+      , ("output_address_changed_rejected", False, mkSettingsAdminOutputAddressChangedRejected)
+      , ("missing_output_datum_rejected", False, mkSettingsAdminMissingDatumRejected)
+      ]
+    )
+  ,
+    ( "Treasury Admin Update"
+    ,
+      [ ("update_treasury_address_valid", True, mkTreasuryAdminUpdateTreasuryAddress)
+      , ("update_staking_keys_valid", True, mkTreasuryAdminUpdateStakingKeys)
+      , ("update_allowance_valid", True, mkTreasuryAdminUpdateAllowance)
+      , ("update_multiple_fields_valid", True, mkTreasuryAdminUpdateMultipleFieldsValid)
+      , ("no_change_valid", True, mkTreasuryAdminNoChangeValid)
+      , ("change_settings_admin_rejected", False, mkTreasuryAdminChangeSettingsAdminRejected)
+      , ("change_metadata_admin_rejected", False, mkTreasuryAdminChangeMetadataAdminRejected)
+      , ("change_treasury_admin_rejected", False, mkTreasuryAdminChangeTreasuryAdminRejected)
+      , ("change_scoopers_rejected", False, mkTreasuryAdminChangeScoopersRejected)
+      , ("change_base_fee_rejected", False, mkTreasuryAdminChangeBaseFeeRejected)
+      , ("change_simple_fee_rejected", False, mkTreasuryAdminChangeSimpleFeeRejected)
+      , ("change_strategy_fee_rejected", False, mkTreasuryAdminChangeStrategyFeeRejected)
+      , ("change_pool_creation_fee_rejected", False, mkTreasuryAdminChangePoolCreationFeeRejected)
+      , ("change_extensions_rejected", False, mkTreasuryAdminChangeExtensionsRejected)
+      , ("wrong_signer_rejected", False, mkTreasuryAdminWrongSignerRejected)
+      , ("cross_redeemer_wrong_admin_rejected", False, mkTreasuryAdminRedeemerSettingsSignerRejected)
+      ]
+    )
+  ,
+    ( "Multisig"
+    ,
+      [ ("allof_both_signers_valid", True, mkMultisigAllOfValid)
+      , ("allof_partial_rejected", False, mkMultisigAllOfPartialRejected)
+      , ("anyof_one_signer_valid", True, mkMultisigAnyOfValid)
+      , ("atleast_sufficient_valid", True, mkMultisigAtLeastValid)
+      , ("atleast_insufficient_rejected", False, mkMultisigAtLeastInsufficientRejected)
+      , ("before_valid", True, mkMultisigBeforeValid)
+      , ("before_expired_rejected", False, mkMultisigBeforeExpiredRejected)
+      , ("after_valid", True, mkMultisigAfterValid)
+      , ("after_too_early_rejected", False, mkMultisigAfterTooEarlyRejected)
+      ]
+    )
+  ,
+    ( "Mint"
+    ,
+      [ ("mint_valid", True, mkMintValidCtx)
+      , ("mint_missing_boot_utxo_rejected", False, mkMintMissingBootUtxoRejected)
+      , ("mint_not_paid_to_script_rejected", False, mkMintNotPaidToScriptRejected)
+      , ("mint_wrong_quantity_rejected", False, mkMintWrongQuantityRejected)
+      , ("mint_no_inline_datum_rejected", False, mkMintNoInlineDatumRejected)
+      ]
+    )
+  ]
 
 -- ============================================================================
 -- Conformance: both scripts must agree on all scenarios

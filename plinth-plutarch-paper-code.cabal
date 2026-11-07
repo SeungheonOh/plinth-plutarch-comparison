@@ -104,6 +104,7 @@ executable bench-scripts
     Constitution.Test.ConstitutionSorted
     Crowdfund.Test.Crowdfund
     Hydra.Test.Head
+    ProgrammableTokens.Test.ProgrammableLogicGlobal
     ProgrammableTokens.Test.ScriptContext.Builder
     Settings.Test.Settings
     Vesting.Test.Vesting

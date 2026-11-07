@@ -6,6 +6,7 @@ module Constitution.Test.ConstitutionSorted (
   mkConstitutionTests,
   mkConstitutionConformanceTests,
   constitutionBenchScenarios,
+  constitutionUnitCases,
 ) where
 
 import Data.Either (isRight)
@@ -240,33 +241,52 @@ mkConstitutionTests name script =
    in testGroup
         name
         [ testGroup
-            "Positive"
-            [ testCase "pos1_multiple_integer_params_in_range" $ assertSucceeds constitutionConfig pos1
-            , testCase "pos2_single_rational_param_in_range" $ assertSucceeds constitutionConfig pos2
-            , testCase "pos3_list_param_execution_unit_prices" $ assertSucceeds constitutionConfig pos3
-            , testCase "pos4_empty_params" $ assertSucceeds constitutionConfig pos4
-            , testCase "pos5_treasury_withdrawal" $ assertSucceeds constitutionConfig pos5
+            groupName
+            [ testCase caseName $ if shouldSucceed then assertSucceeds config ctx else assertFails config ctx
+            | (caseName, shouldSucceed, config, ctx) <- cases
             ]
-        , testGroup
-            "Negative"
-            [ testCase "neg1_below_min_plus_unknown_param" $ assertFails constitutionConfig neg1
-            , testCase "neg2_below_min" $ assertFails constitutionConfig neg2
-            , testCase "neg3_unknown_negative_param" $ assertFails constitutionConfig neg3
-            , testCase "neg4_type_mismatch_int_for_rational" $ assertFails constitutionConfig neg4
-            , testCase "neg5_type_mismatch_rational_for_int" $ assertFails constitutionConfig neg5
-            , testCase "neg6_rational_out_of_limits" $ assertFails constitutionConfig neg6
-            , testCase "neg7_list_sub_param_out_of_range" $ assertFails constitutionConfig neg7
-            , testCase "neg8_list_too_many_sub_params" $ assertFails constitutionConfig neg8
-            , testCase "neg9_list_too_few_sub_params" $ assertFails constitutionConfig neg9
-            , testCase "neg10_list_empty" $ assertFails constitutionConfig neg10
-            , testCase "neg11_list_too_deeply_nested" $ assertFails constitutionConfig neg11
-            , testCase "neg12_info_action_rejected" $ assertFails constitutionConfig neg12
-            ]
-        , testGroup
-            "Sorted"
-            [ testCase "unsorted1_unsorted_params_rejected" $ assertFails constitutionConfig unsorted1
-            ]
+        | (groupName, cases) <- constitutionUnitCases
         ]
+
+{- | Named unit cases, grouped as in the test tree: (test name, expected to
+succeed, arguments applied to the validator in order).
+-}
+constitutionUnitCases :: [(String, [(String, Bool, [(Integer, ParamValue)], ScriptContext)])]
+constitutionUnitCases =
+  [
+    ( "Positive"
+    ,
+      [ ("pos1_multiple_integer_params_in_range", True, constitutionConfig, pos1)
+      , ("pos2_single_rational_param_in_range", True, constitutionConfig, pos2)
+      , ("pos3_list_param_execution_unit_prices", True, constitutionConfig, pos3)
+      , ("pos4_empty_params", True, constitutionConfig, pos4)
+      , ("pos5_treasury_withdrawal", True, constitutionConfig, pos5)
+      ]
+    )
+  ,
+    ( "Negative"
+    ,
+      [ ("neg1_below_min_plus_unknown_param", False, constitutionConfig, neg1)
+      , ("neg2_below_min", False, constitutionConfig, neg2)
+      , ("neg3_unknown_negative_param", False, constitutionConfig, neg3)
+      , ("neg4_type_mismatch_int_for_rational", False, constitutionConfig, neg4)
+      , ("neg5_type_mismatch_rational_for_int", False, constitutionConfig, neg5)
+      , ("neg6_rational_out_of_limits", False, constitutionConfig, neg6)
+      , ("neg7_list_sub_param_out_of_range", False, constitutionConfig, neg7)
+      , ("neg8_list_too_many_sub_params", False, constitutionConfig, neg8)
+      , ("neg9_list_too_few_sub_params", False, constitutionConfig, neg9)
+      , ("neg10_list_empty", False, constitutionConfig, neg10)
+      , ("neg11_list_too_deeply_nested", False, constitutionConfig, neg11)
+      , ("neg12_info_action_rejected", False, constitutionConfig, neg12)
+      ]
+    )
+  ,
+    ( "Sorted"
+    ,
+      [ ("unsorted1_unsorted_params_rejected", False, constitutionConfig, unsorted1)
+      ]
+    )
+  ]
 
 -- ============================================================================
 -- Benchmark scenarios

@@ -5,6 +5,7 @@ module Crowdfund.Test.Crowdfund (
   mkCrowdfundTests,
   mkCrowdfundConformanceTests,
   crowdfundBenchScenarios,
+  crowdfundUnitCases,
 ) where
 
 import Data.ByteString qualified as BS
@@ -415,35 +416,54 @@ mkCrowdfundTests name script =
    in testGroup
         name
         [ testGroup
-            "Donate"
-            [ testCase "donate_new_donor_valid" $ assertSucceeds mkDonateNewDonorCtx
-            , testCase "donate_existing_donor_valid" $ assertSucceeds mkDonateExistingDonorCtx
-            , testCase "donate_second_donor_valid" $ assertSucceeds mkDonateSecondDonorCtx
-            , testCase "donate_after_deadline_rejected" $ assertFails mkDonateAfterDeadlineCtx
-            , testCase "donate_wrong_signer_rejected" $ assertFails mkDonateWrongSignerCtx
-            , testCase "donate_wrong_output_value_rejected" $ assertFails mkDonateWrongOutputValueCtx
-            , testCase "donate_datum_goal_changed_rejected" $ assertFails mkDonateDatumGoalChangedCtx
-            , testCase "donate_other_wallet_tampered_rejected" $ assertFails mkDonateOtherWalletTamperedCtx
-            , testCase "donate_donor_amount_wrong_rejected" $ assertFails mkDonateDonorAmountWrongCtx
-            , testCase "donate_donor_missing_from_output_rejected" $ assertFails mkDonateDonorMissingFromOutputCtx
+            groupName
+            [ testCase caseName $ if shouldSucceed then assertSucceeds ctx else assertFails ctx
+            | (caseName, shouldSucceed, ctx) <- cases
             ]
-        , testGroup
-            "Withdraw"
-            [ testCase "withdraw_valid" $ assertSucceeds mkWithdrawValidCtx
-            , testCase "withdraw_before_deadline_rejected" $ assertFails mkWithdrawBeforeDeadlineCtx
-            , testCase "withdraw_goal_not_met_rejected" $ assertFails mkWithdrawGoalNotMetCtx
-            , testCase "withdraw_wrong_signer_rejected" $ assertFails mkWithdrawWrongSignerCtx
-            ]
-        , testGroup
-            "Reclaim"
-            [ testCase "reclaim_multiple_donors_valid" $ assertSucceeds mkReclaimMultipleCtx
-            , testCase "reclaim_last_donor_valid" $ assertSucceeds mkReclaimLastDonorCtx
-            , testCase "reclaim_before_deadline_rejected" $ assertFails mkReclaimBeforeDeadlineCtx
-            , testCase "reclaim_signer_not_in_wallets_rejected" $ assertFails mkReclaimSignerNotInWalletsCtx
-            , testCase "reclaim_wrong_output_amount_rejected" $ assertFails mkReclaimWrongOutputAmountCtx
-            , testCase "reclaim_wrong_output_datum_rejected" $ assertFails mkReclaimWrongOutputDatumCtx
-            ]
+        | (groupName, cases) <- crowdfundUnitCases
         ]
+
+{- | Named unit cases, grouped as in the test tree: (test name, expected to
+succeed, arguments applied to the validator in order).
+-}
+crowdfundUnitCases :: [(String, [(String, Bool, ScriptContext)])]
+crowdfundUnitCases =
+  [
+    ( "Donate"
+    ,
+      [ ("donate_new_donor_valid", True, mkDonateNewDonorCtx)
+      , ("donate_existing_donor_valid", True, mkDonateExistingDonorCtx)
+      , ("donate_second_donor_valid", True, mkDonateSecondDonorCtx)
+      , ("donate_after_deadline_rejected", False, mkDonateAfterDeadlineCtx)
+      , ("donate_wrong_signer_rejected", False, mkDonateWrongSignerCtx)
+      , ("donate_wrong_output_value_rejected", False, mkDonateWrongOutputValueCtx)
+      , ("donate_datum_goal_changed_rejected", False, mkDonateDatumGoalChangedCtx)
+      , ("donate_other_wallet_tampered_rejected", False, mkDonateOtherWalletTamperedCtx)
+      , ("donate_donor_amount_wrong_rejected", False, mkDonateDonorAmountWrongCtx)
+      , ("donate_donor_missing_from_output_rejected", False, mkDonateDonorMissingFromOutputCtx)
+      ]
+    )
+  ,
+    ( "Withdraw"
+    ,
+      [ ("withdraw_valid", True, mkWithdrawValidCtx)
+      , ("withdraw_before_deadline_rejected", False, mkWithdrawBeforeDeadlineCtx)
+      , ("withdraw_goal_not_met_rejected", False, mkWithdrawGoalNotMetCtx)
+      , ("withdraw_wrong_signer_rejected", False, mkWithdrawWrongSignerCtx)
+      ]
+    )
+  ,
+    ( "Reclaim"
+    ,
+      [ ("reclaim_multiple_donors_valid", True, mkReclaimMultipleCtx)
+      , ("reclaim_last_donor_valid", True, mkReclaimLastDonorCtx)
+      , ("reclaim_before_deadline_rejected", False, mkReclaimBeforeDeadlineCtx)
+      , ("reclaim_signer_not_in_wallets_rejected", False, mkReclaimSignerNotInWalletsCtx)
+      , ("reclaim_wrong_output_amount_rejected", False, mkReclaimWrongOutputAmountCtx)
+      , ("reclaim_wrong_output_datum_rejected", False, mkReclaimWrongOutputDatumCtx)
+      ]
+    )
+  ]
 
 -- ============================================================================
 -- Conformance: both scripts must agree on all scenarios

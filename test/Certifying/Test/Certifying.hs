@@ -6,6 +6,7 @@ module Certifying.Test.Certifying (
   mkCertifyingTests,
   mkCertifyingConformanceTests,
   certifyingBenchScenarios,
+  certifyingUnitCases,
 ) where
 
 import Data.Either (isRight)
@@ -163,30 +164,47 @@ mkCertifyingTests name script =
    in testGroup
         name
         [ testGroup
-            "Positive"
-            [ testCase "register_credential" $ assertSucceeds expiration posRegister
-            , testCase "register_no_deposit" $ assertSucceeds expiration posRegisterNoDeposit
-            , testCase "unregister_after_expiration" $ assertSucceeds expiration posUnregisterAfterExpiration
-            , testCase "delegate_to_abstain" $ assertSucceeds expiration posDelegateAbstain
-            , testCase "register_and_delegate_to_abstain" $ assertSucceeds expiration posRegDelegAbstain
+            groupName
+            [ testCase caseName $ if shouldSucceed then assertSucceeds exp ctx else assertFails exp ctx
+            | (caseName, shouldSucceed, exp, ctx) <- cases
             ]
-        , testGroup
-            "Negative"
-            [ testCase "unregister_before_expiration" $ assertFails expiration negUnregisterBeforeExpiration
-            , testCase "unregister_straddles_expiration" $ assertFails expiration negUnregisterStraddlesExpiration
-            , testCase "unregister_always_range" $ assertFails expiration negUnregisterAlways
-            , testCase "delegate_no_confidence" $ assertFails expiration negDelegateNoConfidence
-            , testCase "delegate_to_stake_pool" $ assertFails expiration negDelegateStake
-            , testCase "delegate_specific_drep" $ assertFails expiration negDelegateSpecificDRep
-            , testCase "delegate_stake_vote_abstain" $ assertFails expiration negDelegStakeVoteAbstain
-            , testCase "register_delegate_no_confidence" $ assertFails expiration negRegDelegNoConfidence
-            , testCase "register_delegate_stake_pool" $ assertFails expiration negRegDelegStake
-            , testCase "register_delegate_stake_vote_abstain" $ assertFails expiration negRegDelegStakeVoteAbstain
-            , testCase "pool_register" $ assertFails expiration negPoolRegister
-            , testCase "pool_retire" $ assertFails expiration negPoolRetire
-            , testCase "auth_hot_committee" $ assertFails expiration negAuthHotCommittee
-            ]
+        | (groupName, cases) <- certifyingUnitCases
         ]
+
+{- | Named unit cases, grouped as in the test tree: (test name, expected to
+succeed, expiration argument, script context).
+-}
+certifyingUnitCases :: [(String, [(String, Bool, Integer, ScriptContext)])]
+certifyingUnitCases =
+  [
+    ( "Positive"
+    ,
+      [ ("register_credential", True, expiration, posRegister)
+      , ("register_no_deposit", True, expiration, posRegisterNoDeposit)
+      , ("unregister_after_expiration", True, expiration, posUnregisterAfterExpiration)
+      , ("delegate_to_abstain", True, expiration, posDelegateAbstain)
+      , ("register_and_delegate_to_abstain", True, expiration, posRegDelegAbstain)
+      ]
+    )
+  ,
+    ( "Negative"
+    ,
+      [ ("unregister_before_expiration", False, expiration, negUnregisterBeforeExpiration)
+      , ("unregister_straddles_expiration", False, expiration, negUnregisterStraddlesExpiration)
+      , ("unregister_always_range", False, expiration, negUnregisterAlways)
+      , ("delegate_no_confidence", False, expiration, negDelegateNoConfidence)
+      , ("delegate_to_stake_pool", False, expiration, negDelegateStake)
+      , ("delegate_specific_drep", False, expiration, negDelegateSpecificDRep)
+      , ("delegate_stake_vote_abstain", False, expiration, negDelegStakeVoteAbstain)
+      , ("register_delegate_no_confidence", False, expiration, negRegDelegNoConfidence)
+      , ("register_delegate_stake_pool", False, expiration, negRegDelegStake)
+      , ("register_delegate_stake_vote_abstain", False, expiration, negRegDelegStakeVoteAbstain)
+      , ("pool_register", False, expiration, negPoolRegister)
+      , ("pool_retire", False, expiration, negPoolRetire)
+      , ("auth_hot_committee", False, expiration, negAuthHotCommittee)
+      ]
+    )
+  ]
 
 -- ============================================================================
 -- Benchmark scenarios

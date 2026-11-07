@@ -2,6 +2,9 @@
 
 module ProgrammableTokens.Test.ProgrammableLogicGlobal (
   mkGlobalTests,
+  globalUnitCases,
+  globalBenchScenarios,
+  protocolParamsCS,
 ) where
 
 import Data.ByteString qualified as BS
@@ -71,32 +74,13 @@ mkGlobalTests name script =
               ("expected successful evaluation, got: " ++ show res ++ " logs: " ++ show logs)
               (isRight res)
       assertFails ctx = assertBool "expected script failure" (failsWith ctx)
-   in testGroup
-        name
-        [ testCase "unit_seizeAct_complete_indices_succeeds" $ assertSucceeds (mkGlobalSeizeCtx 3 [0, 0, 0])
-        , testCase "unit_seizeAct_pubkey_index_rejected" $
-            assertFails (mkGlobalSeizeCtxWithLeadingPubKey 1 [0])
-        , testCase "unit_seizeAct_omitted_index_rejected" $ assertFails (mkGlobalSeizeCtx 3 [0, 0])
-        , testCase "unit_seizeAct_datum_mismatch_rejected" $ assertFails mkGlobalSeizeDatumMismatchCtx
-        , testCase "unit_seizeAct_reference_script_mismatch_rejected" $
-            assertFails mkGlobalSeizeReferenceScriptMismatchCtx
-        , testCase "unit_seizeAct_burn_offsets_delta_succeeds" $ assertSucceeds mkGlobalSeizeBurnCtx
-        , testCase "unit_seizeAct_mint_with_containment_succeeds" $
-            assertSucceeds mkGlobalSeizeMintContainedCtx
-        , testCase "unit_seizeAct_mint_smuggle_rejected" $ assertFails mkGlobalSeizeMintEscapeCtx
-        , testCase "unit_transferAct_burn_with_mint_proof_succeeds" $
-            assertSucceeds (mkGlobalTransferMintCtx (mkTransferAct [1] [1]) (-1) 0)
-        , testCase "unit_transferAct_burn_without_mint_proof_rejected" $
-            assertFails (mkGlobalTransferMintCtx (mkTransferAct [1] []) (-1) 0)
-        , testCase "unit_transferAct_escape_to_pubkey_rejected" $ assertFails mkGlobalTransferEscapeCtx
-        , testCase "unit_transferAct_mint_smuggle_rejected" $
-            assertFails (mkGlobalTransferMintCtx (mkTransferAct [1] [1]) 1 1)
-        , testCase "unit_transferAct_mint_with_proof_and_containment_succeeds" $
-            assertSucceeds (mkGlobalTransferMintCtx (mkTransferAct [1] [1]) 1 2)
-        , testCase "unit_transferAct_mint_without_mint_proof_rejected" $
-            assertFails (mkGlobalTransferMintCtx (mkTransferAct [1] []) 1 2)
-        , testCase "unit_seizeAct_escape_to_pubkey_rejected" $ assertFails mkGlobalSeizeDirectEscapeCtx
-        , testProperty "prop_seizeAct_complete_indices_succeeds" $
+      unitTests =
+        [ testCase caseName $ if shouldSucceed then assertSucceeds ctx else assertFails ctx
+        | (caseName, shouldSucceed, ctx) <- globalUnitCases
+        ]
+   in testGroup name $
+        unitTests
+          ++ [ testProperty "prop_seizeAct_complete_indices_succeeds" $
             QC.forAll (QC.chooseInt (1, 12)) $ \nInt ->
               let n = fromIntegral nInt
                in succeedsWith (mkGlobalSeizeCtx n (replicate nInt 0)) QC.=== True
@@ -144,6 +128,52 @@ mkGlobalTests name script =
               ]
               (mkValue [(programmableTransferCS, TokenName "0c", 5), (programmableTransferCS, TokenName "0d", 5)])
         ]
+
+{- | Named unit cases of the validator, as they appear in the test tree:
+(test name, expected to succeed, script context). The validator is applied to
+'protocolParamsCS' and then the context.
+-}
+globalUnitCases :: [(String, Bool, ScriptContext)]
+globalUnitCases =
+  [ ("unit_seizeAct_complete_indices_succeeds", True, mkGlobalSeizeCtx 3 [0, 0, 0])
+  , ("unit_seizeAct_pubkey_index_rejected", False, mkGlobalSeizeCtxWithLeadingPubKey 1 [0])
+  , ("unit_seizeAct_omitted_index_rejected", False, mkGlobalSeizeCtx 3 [0, 0])
+  , ("unit_seizeAct_datum_mismatch_rejected", False, mkGlobalSeizeDatumMismatchCtx)
+  , ("unit_seizeAct_reference_script_mismatch_rejected", False, mkGlobalSeizeReferenceScriptMismatchCtx)
+  , ("unit_seizeAct_burn_offsets_delta_succeeds", True, mkGlobalSeizeBurnCtx)
+  , ("unit_seizeAct_mint_with_containment_succeeds", True, mkGlobalSeizeMintContainedCtx)
+  , ("unit_seizeAct_mint_smuggle_rejected", False, mkGlobalSeizeMintEscapeCtx)
+  , ("unit_transferAct_burn_with_mint_proof_succeeds", True, mkGlobalTransferMintCtx (mkTransferAct [1] [1]) (-1) 0)
+  , ("unit_transferAct_burn_without_mint_proof_rejected", False, mkGlobalTransferMintCtx (mkTransferAct [1] []) (-1) 0)
+  , ("unit_transferAct_escape_to_pubkey_rejected", False, mkGlobalTransferEscapeCtx)
+  , ("unit_transferAct_mint_smuggle_rejected", False, mkGlobalTransferMintCtx (mkTransferAct [1] [1]) 1 1)
+  , ("unit_transferAct_mint_with_proof_and_containment_succeeds", True, mkGlobalTransferMintCtx (mkTransferAct [1] [1]) 1 2)
+  , ("unit_transferAct_mint_without_mint_proof_rejected", False, mkGlobalTransferMintCtx (mkTransferAct [1] []) 1 2)
+  , ("unit_seizeAct_escape_to_pubkey_rejected", False, mkGlobalSeizeDirectEscapeCtx)
+  ]
+
+-- | Cost-table scenarios (applied to 'protocolParamsCS' and the context).
+globalBenchScenarios :: [(String, ScriptContext)]
+globalBenchScenarios =
+  [ ("seize: 1 input, complete indices", mkGlobalSeizeCtx 1 [0])
+  , ("seize: 3 inputs, complete indices", mkGlobalSeizeCtx 3 [0, 0, 0])
+  , ("seize: 5 inputs, complete indices", mkGlobalSeizeCtx 5 [0, 0, 0, 0, 0])
+  , ("seize: 10 inputs, complete indices", mkGlobalSeizeCtx 10 (replicate 10 0))
+  , ("seize: pubkey index (reject)", mkGlobalSeizeCtxWithLeadingPubKey 1 [0])
+  , ("seize: omitted index (reject)", mkGlobalSeizeCtx 3 [0, 0])
+  , ("seize: datum mismatch (reject)", mkGlobalSeizeDatumMismatchCtx)
+  , ("seize: ref script mismatch (reject)", mkGlobalSeizeReferenceScriptMismatchCtx)
+  , ("seize: burn offsets delta", mkGlobalSeizeBurnCtx)
+  , ("seize: mint contained", mkGlobalSeizeMintContainedCtx)
+  , ("seize: mint smuggle (reject)", mkGlobalSeizeMintEscapeCtx)
+  , ("seize: escape to pubkey (reject)", mkGlobalSeizeDirectEscapeCtx)
+  , ("transfer: burn with mint proof", mkGlobalTransferMintCtx (mkTransferAct [1] [1]) (-1) 0)
+  , ("transfer: burn no mint proof (reject)", mkGlobalTransferMintCtx (mkTransferAct [1] []) (-1) 0)
+  , ("transfer: escape to pubkey (reject)", mkGlobalTransferEscapeCtx)
+  , ("transfer: mint smuggle (reject)", mkGlobalTransferMintCtx (mkTransferAct [1] [1]) 1 1)
+  , ("transfer: mint with proof+containment", mkGlobalTransferMintCtx (mkTransferAct [1] [1]) 1 2)
+  , ("transfer: mint no proof (reject)", mkGlobalTransferMintCtx (mkTransferAct [1] []) 1 2)
+  ]
 
 assertOutputsContainSucceeds :: Credential -> [TxOut] -> Value -> Assertion
 assertOutputsContainSucceeds cred outputs expected =

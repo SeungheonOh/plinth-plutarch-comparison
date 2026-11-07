@@ -7,6 +7,7 @@ module Hydra.Test.Head (
   mkHeadTests,
   mkHeadConformanceTests,
   headBenchScenarios,
+  headUnitCases,
 ) where
 
 import Data.ByteString qualified as BS
@@ -524,17 +525,26 @@ mkHeadTests name script =
         assertBool "expected script failure" (not (eval ctx))
    in testGroup
         name
-        [ testCase "unit_fanout_valid" $ assertSucceeds mkFanoutCtx
-        , testCase "unit_fanout_hash_mismatch_rejected" $ assertFails mkFanoutHashMismatchCtx
-        , testCase "unit_fanout_before_deadline_rejected" $ assertFails mkFanoutBeforeDeadlineCtx
-        , testCase "unit_fanout_burn_mismatch_rejected" $ assertFails mkFanoutBurnMismatchCtx
-        , testCase "unit_close_initial_valid" $ assertSucceeds mkCloseInitialCtx
-        , testCase "unit_close_initial_wrong_version_rejected" $ assertFails mkCloseInitialWrongVersionCtx
-        , testCase "unit_contest_no_sigs_rejected" $ assertFails mkContestCtx
-        , testCase "unit_contest_not_newer_rejected" $ assertFails mkContestNotNewerCtx
-        , testCase "unit_contest_after_deadline_rejected" $ assertFails mkContestAfterDeadlineCtx
-        , testCase "unit_invalid_transition_rejected" $ assertFails mkInvalidTransitionCtx
+        [ testCase caseName $ if shouldSucceed then assertSucceeds ctx else assertFails ctx
+        | (caseName, shouldSucceed, ctx) <- headUnitCases
         ]
+
+{- | Named unit cases, as they appear in the test tree: (test name, expected to
+succeed, arguments applied to the validator in order).
+-}
+headUnitCases :: [(String, Bool, ScriptContext)]
+headUnitCases =
+  [ ("unit_fanout_valid", True, mkFanoutCtx)
+  , ("unit_fanout_hash_mismatch_rejected", False, mkFanoutHashMismatchCtx)
+  , ("unit_fanout_before_deadline_rejected", False, mkFanoutBeforeDeadlineCtx)
+  , ("unit_fanout_burn_mismatch_rejected", False, mkFanoutBurnMismatchCtx)
+  , ("unit_close_initial_valid", True, mkCloseInitialCtx)
+  , ("unit_close_initial_wrong_version_rejected", False, mkCloseInitialWrongVersionCtx)
+  , ("unit_contest_no_sigs_rejected", False, mkContestCtx)
+  , ("unit_contest_not_newer_rejected", False, mkContestNotNewerCtx)
+  , ("unit_contest_after_deadline_rejected", False, mkContestAfterDeadlineCtx)
+  , ("unit_invalid_transition_rejected", False, mkInvalidTransitionCtx)
+  ]
 
 -- ============================================================================
 -- Conformance: both scripts must agree on all scenarios

@@ -5,6 +5,7 @@ module Vesting.Test.Vesting (
   mkVestingTests,
   mkVestingConformanceTests,
   vestingBenchScenarios,
+  vestingUnitCases,
 ) where
 
 import Data.ByteString qualified as BS
@@ -625,40 +626,57 @@ mkVestingTests name script =
    in testGroup
         name
         [ testGroup
-            "Positive"
-            [ testCase "full_withdrawal_after_vesting" $ assertSucceeds mkFullWithdrawalAfterVestingCtx
-            , testCase "partial_withdrawal_midpoint" $ assertSucceeds mkPartialWithdrawalMidpointCtx
-            , testCase "second_partial_withdrawal" $ assertSucceeds mkSecondPartialWithdrawalCtx
-            , testCase "full_withdrawal_at_end" $ assertSucceeds mkFullWithdrawalAtEndCtx
-            , testCase "small_withdrawal_early" $ assertSucceeds mkSmallWithdrawalEarlyCtx
-            , testCase "third_partial_drains_remaining" $ assertSucceeds mkThirdPartialDrainsRemainingCtx
-            , testCase "odd_division_partial" $ assertSucceeds mkOddDivisionPartialCtx
-            , testCase "odd_division_partial_second" $ assertSucceeds mkOddDivisionPartial2Ctx
-            , testCase "multiple_beneficiary_outputs" $ assertSucceeds mkMultipleBeneficiaryOutputsCtx
-            , testCase "zero_fee_full_withdrawal" $ assertSucceeds mkZeroFeeFullWithdrawalCtx
-            , testCase "quarter_vested" $ assertSucceeds mkQuarterVestedCtx
-            , testCase "ninety_percent_vested" $ assertSucceeds mkNinetyPercentVestedCtx
+            groupName
+            [ testCase caseName $ if shouldSucceed then assertSucceeds ctx else assertFails ctx
+            | (caseName, shouldSucceed, ctx) <- cases
             ]
-        , testGroup
-            "Negative"
-            [ testCase "not_signed_by_beneficiary" $ assertFails mkNotSignedByBeneficiaryCtx
-            , testCase "wrong_declared_amount" $ assertFails mkWrongDeclaredAmountCtx
-            , testCase "over_claiming" $ assertFails mkOverClaimingCtx
-            , testCase "under_claiming" $ assertFails mkUnderClaimingCtx
-            , testCase "wrong_beneficiary_output" $ assertFails mkWrongBeneficiaryOutputCtx
-            , testCase "partial_wrong_datum" $ assertFails mkPartialWithdrawalWrongDatumCtx
-            , testCase "partial_no_contract_output" $ assertFails mkPartialWithdrawalNoContractOutputCtx
-            , testCase "partial_multiple_contract_outputs" $ assertFails mkPartialWithdrawalMultipleOutputsCtx
-            , testCase "before_vesting_starts" $ assertFails mkBeforeVestingStartsCtx
-            , testCase "partial_beneficiary_changed" $ assertFails mkPartialWithdrawalBeneficiaryChangedCtx
-            , testCase "partial_duration_changed" $ assertFails mkPartialWithdrawalDurationChangedCtx
-            , testCase "partial_start_changed" $ assertFails mkPartialWithdrawalStartChangedCtx
-            , testCase "neginf_range_nonzero_claim" $ assertFails mkNegInfRangeClaimCtx
-            , testCase "posinf_range_nonzero_claim" $ assertFails mkPosInfRangeClaimCtx
-            , testCase "exact_start_time_nonzero_claim" $ assertFails mkExactStartTimeDeclareNonZeroCtx
-            , testCase "odd_division_off_by_one" $ assertFails mkOddDivisionWrongAmountCtx
-            ]
+        | (groupName, cases) <- vestingUnitCases
         ]
+
+{- | Named unit cases, grouped as in the test tree: (test name, expected to
+succeed, arguments applied to the validator in order).
+-}
+vestingUnitCases :: [(String, [(String, Bool, ScriptContext)])]
+vestingUnitCases =
+  [
+    ( "Positive"
+    ,
+      [ ("full_withdrawal_after_vesting", True, mkFullWithdrawalAfterVestingCtx)
+      , ("partial_withdrawal_midpoint", True, mkPartialWithdrawalMidpointCtx)
+      , ("second_partial_withdrawal", True, mkSecondPartialWithdrawalCtx)
+      , ("full_withdrawal_at_end", True, mkFullWithdrawalAtEndCtx)
+      , ("small_withdrawal_early", True, mkSmallWithdrawalEarlyCtx)
+      , ("third_partial_drains_remaining", True, mkThirdPartialDrainsRemainingCtx)
+      , ("odd_division_partial", True, mkOddDivisionPartialCtx)
+      , ("odd_division_partial_second", True, mkOddDivisionPartial2Ctx)
+      , ("multiple_beneficiary_outputs", True, mkMultipleBeneficiaryOutputsCtx)
+      , ("zero_fee_full_withdrawal", True, mkZeroFeeFullWithdrawalCtx)
+      , ("quarter_vested", True, mkQuarterVestedCtx)
+      , ("ninety_percent_vested", True, mkNinetyPercentVestedCtx)
+      ]
+    )
+  ,
+    ( "Negative"
+    ,
+      [ ("not_signed_by_beneficiary", False, mkNotSignedByBeneficiaryCtx)
+      , ("wrong_declared_amount", False, mkWrongDeclaredAmountCtx)
+      , ("over_claiming", False, mkOverClaimingCtx)
+      , ("under_claiming", False, mkUnderClaimingCtx)
+      , ("wrong_beneficiary_output", False, mkWrongBeneficiaryOutputCtx)
+      , ("partial_wrong_datum", False, mkPartialWithdrawalWrongDatumCtx)
+      , ("partial_no_contract_output", False, mkPartialWithdrawalNoContractOutputCtx)
+      , ("partial_multiple_contract_outputs", False, mkPartialWithdrawalMultipleOutputsCtx)
+      , ("before_vesting_starts", False, mkBeforeVestingStartsCtx)
+      , ("partial_beneficiary_changed", False, mkPartialWithdrawalBeneficiaryChangedCtx)
+      , ("partial_duration_changed", False, mkPartialWithdrawalDurationChangedCtx)
+      , ("partial_start_changed", False, mkPartialWithdrawalStartChangedCtx)
+      , ("neginf_range_nonzero_claim", False, mkNegInfRangeClaimCtx)
+      , ("posinf_range_nonzero_claim", False, mkPosInfRangeClaimCtx)
+      , ("exact_start_time_nonzero_claim", False, mkExactStartTimeDeclareNonZeroCtx)
+      , ("odd_division_off_by_one", False, mkOddDivisionWrongAmountCtx)
+      ]
+    )
+  ]
 
 -- ============================================================================
 -- Conformance: both scripts must agree on all scenarios

@@ -5,6 +5,7 @@ module Voting.Test.Voting (
   mkVotingTests,
   mkVotingConformanceTests,
   votingBenchScenarios,
+  votingUnitCases,
 ) where
 
 import Data.Either (isRight)
@@ -177,21 +178,38 @@ mkVotingTests name script =
    in testGroup
         name
         [ testGroup
-            "Positive"
-            [ testCase "nft_in_script_input" $ assertSucceeds nftCS nftTN posNFTInScriptInput
-            , testCase "nft_in_pubkey_input" $ assertSucceeds nftCS nftTN posNFTInPubKeyInput
-            , testCase "nft_among_multiple_inputs" $ assertSucceeds nftCS nftTN posNFTAmongMultipleInputs
-            , testCase "nft_with_other_tokens" $ assertSucceeds nftCS nftTN posNFTWithOtherTokens
+            groupName
+            [ testCase caseName $ if shouldSucceed then assertSucceeds cs tn ctx else assertFails cs tn ctx
+            | (caseName, shouldSucceed, cs, tn, ctx) <- cases
             ]
-        , testGroup
-            "Negative"
-            [ testCase "no_nft_in_inputs" $ assertFails nftCS nftTN negNoNFTInInputs
-            , testCase "wrong_currency_symbol" $ assertFails nftCS nftTN negWrongCS
-            , testCase "wrong_token_name" $ assertFails nftCS nftTN negWrongTN
-            , testCase "empty_inputs" $ assertFails nftCS nftTN negEmptyInputs
-            , testCase "multiple_inputs_no_nft" $ assertFails nftCS nftTN negMultipleInputsNoNFT
-            ]
+        | (groupName, cases) <- votingUnitCases
         ]
+
+{- | Named unit cases, grouped as in the test tree: (test name, expected to
+succeed, arguments applied to the validator in order).
+-}
+votingUnitCases :: [(String, [(String, Bool, CurrencySymbol, TokenName, ScriptContext)])]
+votingUnitCases =
+  [
+    ( "Positive"
+    ,
+      [ ("nft_in_script_input", True, nftCS, nftTN, posNFTInScriptInput)
+      , ("nft_in_pubkey_input", True, nftCS, nftTN, posNFTInPubKeyInput)
+      , ("nft_among_multiple_inputs", True, nftCS, nftTN, posNFTAmongMultipleInputs)
+      , ("nft_with_other_tokens", True, nftCS, nftTN, posNFTWithOtherTokens)
+      ]
+    )
+  ,
+    ( "Negative"
+    ,
+      [ ("no_nft_in_inputs", False, nftCS, nftTN, negNoNFTInInputs)
+      , ("wrong_currency_symbol", False, nftCS, nftTN, negWrongCS)
+      , ("wrong_token_name", False, nftCS, nftTN, negWrongTN)
+      , ("empty_inputs", False, nftCS, nftTN, negEmptyInputs)
+      , ("multiple_inputs_no_nft", False, nftCS, nftTN, negMultipleInputsNoNFT)
+      ]
+    )
+  ]
 
 -- ============================================================================
 -- Benchmark scenarios
