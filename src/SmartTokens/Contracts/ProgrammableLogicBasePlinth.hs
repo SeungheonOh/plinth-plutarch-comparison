@@ -526,7 +526,7 @@ processThirdPartyTransfer programmableCS progLogicCred inputs progOutputs inputI
       ( \_ ->
           let finalDelta = biTokenUnion deltaAccumulator mintedTokens
               outputAccumulator = accumulateProgOutputTokens programmableOutputs
-           in biTokenPairsContain outputAccumulator finalDelta || error ()
+           in if biTokenPairsContain outputAccumulator finalDelta then True else error ()
       )
       ( \relIdx restIdxs ->
           let dropped = BuiltinList.drop relIdx remainingInputs
