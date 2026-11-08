@@ -124,7 +124,7 @@ runBatch opts = do
               (outcome, rendered) = case res of
                 Cek.CekFailure err ->
                   let msg = show err
-                   in if "OutOfEx" `isInfixOf` msg then ("BUDGET", "budget") else ("FAIL", failureClass msg)
+                   in if "OutOfEx" `isInfixOf` msg || "overspending the budget" `isInfixOf` msg then ("BUDGET", "budget") else ("FAIL", failureClass msg)
                 Cek.CekSuccessConstant c -> ("OK", canonicalTerm (UPLC.Constant () c))
                 Cek.CekSuccessNonConstant t -> ("OK", canonicalTerm t)
            in outcome ++ "\t" ++ show cpu ++ "\t" ++ show mem ++ "\t" ++ clean rendered ++ "\t" ++ traces
