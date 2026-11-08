@@ -136,6 +136,7 @@ executable cross-bench
   other-modules:
     Certifying.Test.Certifying
     Constitution.Test.ConstitutionSorted
+    CrossBench.Batch
     CrossBench.Cases
     CrossBench.Csv
     CrossBench.Eval

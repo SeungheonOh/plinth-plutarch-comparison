@@ -4,6 +4,11 @@
       Write DIR/<Validator>/{cases.csv, plinth.flat, plutarch.flat} for every
       validator. Fails if Plinth or Plutarch disagree with a case's expectation.
 
+  cross-bench batch [--semantics A..E] [--cpu N] [--mem N]
+      Evaluate (program, arguments) jobs read from stdin on the CEK machine
+      and print outcome, spent budget, a canonical rendering of the result
+      value and the emitted traces (see "CrossBench.Batch").
+
   cross-bench run [DIR] [--validator V] [--no-fail]
       Evaluate every script found in DIR/<Validator>/ on every case of that
       validator under cost-model variants C and E, print a CSV report on
@@ -15,6 +20,7 @@ DIR defaults to /Users/sho/fun/cross-bench-data.
 module Main (main) where
 
 import Control.Monad (forM, forM_, unless, when)
+import CrossBench.Batch (BatchOptions (..), defaultBatchOptions, runBatch)
 import CrossBench.Cases (CaseKind (..), CaseSpec (..), ValidatorSpec (..), caseKindName, validatorSpecs)
 import CrossBench.Csv (parseCsv, renderRow)
 import CrossBench.Eval
@@ -46,6 +52,7 @@ main = do
       [dir] | not ("-" `isPrefixOf` dir) -> exportAll dir
       _ -> usage
     "run" : rest -> either (const usage) runAll (parseRunOptions rest)
+    "batch" : rest -> either (const usage) runBatch (parseBatchOptions defaultBatchOptions rest)
     "inspect" : rest -> either (const usage) inspect (parseRunOptions rest)
     ["assemble", input, output] -> do
       text <- readFile input
@@ -60,10 +67,19 @@ main = do
 usage :: IO a
 usage = do
   hPutStrLn stderr "usage: cross-bench export [DIR]"
+  hPutStrLn stderr "       cross-bench batch [--semantics A..E] [--cpu N] [--mem N] < JOBS"
   hPutStrLn stderr "       cross-bench run [DIR] [--validator V] [--no-fail]"
   hPutStrLn stderr "       cross-bench inspect [DIR] --validator V [--case NAME]"
   hPutStrLn stderr "       cross-bench assemble IN.uplc OUT.flat.hex"
   exitWith (ExitFailure 2)
+
+parseBatchOptions :: BatchOptions -> [String] -> Either String BatchOptions
+parseBatchOptions opts args = case args of
+  [] -> Right opts
+  "--semantics" : v : rest -> parseBatchOptions opts {boVariant = v} rest
+  "--cpu" : n : rest | Just c <- readMaybe n -> parseBatchOptions opts {boCpu = c} rest
+  "--mem" : n : rest | Just m <- readMaybe n -> parseBatchOptions opts {boMem = m} rest
+  a : _ -> Left ("unexpected argument " ++ a)
 
 -- ============================================================================
 -- Results
