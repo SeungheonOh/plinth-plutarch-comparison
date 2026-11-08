@@ -150,6 +150,7 @@ executable cross-bench
 
   build-depends:
     , bytestring
+    , containers
     , directory
     , mtl
     , text

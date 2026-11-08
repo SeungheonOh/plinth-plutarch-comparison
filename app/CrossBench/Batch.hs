@@ -8,6 +8,11 @@ Input: one job per line, three tab-separated fields
 
   ID <TAB> PROGRAM <TAB> ARGS
 
+or, to avoid repeating large programs and arguments, definition lines:
+@P <TAB> PID <TAB> PROGRAM@ defines a program, @A <TAB> ARGS@ sets the
+current arguments, and @J <TAB> ID <TAB> PID@ evaluates program PID on the
+current arguments.
+
 where PROGRAM is a flat-encoded UPLC program in hex and ARGS is a
 comma-separated (possibly empty) list of arguments, each either
 @d:<hex>@ (a CBOR-encoded 'Data', applied as a constant) or @t:<hex>@ (a
@@ -34,7 +39,9 @@ module CrossBench.Batch (
 
 import Control.Exception (SomeException, evaluate, try)
 import Data.ByteString.Char8 qualified as BS8
+import Data.IORef (modifyIORef', newIORef, readIORef, writeIORef)
 import Data.List (isInfixOf)
+import Data.Map.Strict qualified as Map
 import Data.Text.Encoding qualified as TE
 import PlutusCore qualified as PLC
 import PlutusCore.Default (BuiltinSemanticsVariant (DefaultFunSemanticsVariantA, DefaultFunSemanticsVariantB, DefaultFunSemanticsVariantC, DefaultFunSemanticsVariantD, DefaultFunSemanticsVariantE), DefaultFun, DefaultUni)
@@ -74,29 +81,39 @@ runBatch :: BatchOptions -> IO ()
 runBatch opts = do
   variant <- either fail pure (semantics (boVariant opts))
   let params = defaultCekParametersForVariant variant
-      loop = do
+  programs <- newIORef (Map.empty :: Map.Map String (Either String DTerm))
+  current <- newIORef (Right [] :: Either String [DTerm])
+  let loop = do
         eof <- hIsEOF stdin
         if eof
           then hFlush stdout
           else do
             line <- BS8.getLine
-            out <- runLine params (BS8.unpack line)
-            putStrLn out
+            case splitTab (BS8.unpack line) of
+              ["P", pid, hex] ->
+                modifyIORef' programs (Map.insert pid (decodeProgram hex))
+              ["A", args] -> writeIORef current (decodeArgs args)
+              ["A"] -> writeIORef current (Right [])
+              ["J", jobId, pid] -> do
+                prog <- Map.lookup pid <$> readIORef programs
+                args <- readIORef current
+                let term = do
+                      body <- maybe (Left ("unknown program " ++ pid)) id prog
+                      foldl (UPLC.Apply ()) body <$> args
+                emit jobId term
+              [jobId, prog, args] ->
+                emit jobId (decodeProgram prog >>= \body -> foldl (UPLC.Apply ()) body <$> decodeArgs args)
+              [""] -> pure ()
+              fields -> putStrLn (headOr "?" fields ++ "\tBAD\t0\t0\tunexpected line\t")
             loop
-  loop
-  where
-    runLine params line = case splitTab line of
-      [jobId, prog, args] -> do
-        result <- try (evaluate (forceString (runJob params prog args)))
-        pure $ case result of
+      emit jobId term = do
+        result <- try (evaluate (forceString (either (\err -> "BAD\t0\t0\t" ++ clean err ++ "\t") (runTerm params) term)))
+        putStrLn $ case result of
           Right s -> jobId ++ "\t" ++ s
           Left (e :: SomeException) -> jobId ++ "\tBAD\t0\t0\t" ++ clean (show e) ++ "\t"
-      [""] -> pure ""
-      fields -> pure (headOr "?" fields ++ "\tBAD\t0\t0\texpected 3 fields\t")
-    runJob params progHex argsField =
-      case decodeJob progHex argsField of
-        Left err -> "BAD\t0\t0\t" ++ clean err ++ "\t"
-        Right term ->
+  loop
+  where
+    runTerm params term =
           let named = UPLC.termMapNames UPLC.fakeNameDeBruijn term
               Cek.CekReport res (Cek.RestrictingSt (ExRestrictingBudget (ExBudget (ExCPU cpuLeft) (ExMemory memLeft)))) logs =
                 Cek.runCekDeBruijn params (Cek.restricting (ExRestrictingBudget (ExBudget (ExCPU (fromIntegral (boCpu opts))) (ExMemory (fromIntegral (boMem opts)))))) Cek.logEmitter named
@@ -118,18 +135,18 @@ headOr :: a -> [a] -> a
 headOr d [] = d
 headOr _ (x : _) = x
 
-decodeJob :: String -> String -> Either String DTerm
-decodeJob progHex argsField = do
-  UPLC.Program _ _ body <- decodeHex progHex >>= decodeFlat
-  args <- mapM decodeArg (filter (not . null) (splitComma argsField))
-  pure (foldl (UPLC.Apply ()) body args)
+decodeProgram :: String -> Either String DTerm
+decodeProgram hex = do
+  UPLC.Program _ _ body <- decodeHex hex >>= decodeFlat
+  pure body
+
+decodeArgs :: String -> Either String [DTerm]
+decodeArgs argsField = mapM decodeArg (filter (not . null) (splitComma argsField))
   where
     decodeArg ('d' : ':' : hex) = do
       d <- decodeHex hex >>= deserialiseData
       pure (UPLC.Constant () (PLC.someValue d))
-    decodeArg ('t' : ':' : hex) = do
-      UPLC.Program _ _ t <- decodeHex hex >>= decodeFlat
-      pure t
+    decodeArg ('t' : ':' : hex) = decodeProgram hex
     decodeArg other = Left ("bad argument " ++ take 20 other)
 
 {- | A canonical rendering of a CEK result, independent of how a compiler
