@@ -15,7 +15,8 @@ current arguments.
 
 where PROGRAM is a flat-encoded UPLC program in hex and ARGS is a
 comma-separated (possibly empty) list of arguments, each either
-@d:<hex>@ (a CBOR-encoded 'Data', applied as a constant) or @t:<hex>@ (a
+@d:<hex>@ (a CBOR-encoded 'Data', applied as a constant), @i:<decimal>@ (an
+integer constant), @b:<hex>@ (a bytestring constant) or @t:<hex>@ (a
 flat-encoded closed program whose body is applied as a term).
 
 Output: one line per job, six tab-separated fields
@@ -147,6 +148,10 @@ decodeArgs argsField = mapM decodeArg (filter (not . null) (splitComma argsField
       d <- decodeHex hex >>= deserialiseData
       pure (UPLC.Constant () (PLC.someValue d))
     decodeArg ('t' : ':' : hex) = decodeProgram hex
+    decodeArg ('i' : ':' : digits) = case reads digits of
+      [(n, "")] -> Right (UPLC.Constant () (PLC.someValue (n :: Integer)))
+      _ -> Left "bad integer argument"
+    decodeArg ('b' : ':' : hex) = UPLC.Constant () . PLC.someValue <$> decodeHex hex
     decodeArg other = Left ("bad argument " ++ take 20 other)
 
 {- | A canonical rendering of a CEK result, independent of how a compiler
